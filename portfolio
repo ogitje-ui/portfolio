@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ogi Babić - The Narrative Portfolio</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 1s ease-out',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-[#fafafa] text-slate-900 transition-colors duration-500 selection:bg-teal-200 dark:selection:bg-teal-900">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- ICONS ---
+        const Icons = {
+            Linkedin: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>,
+            Mail: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>,
+            Phone: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>,
+            ArrowRight: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>,
+            Brain: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>,
+            Users: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+            Compass: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>,
+            ChevronDown: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>,
+            Sun: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>,
+            Moon: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>,
+            Globe: (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+        };
+
+        // --- DATA ---
+        const PROFILE = {
+          name: "Ogi Babić",
+          manifesto: "I believe the best sales strategies aren't built on aggressive tactics, but on psychological insight. I bridge the gap between complex tech ecosystems and human motivations.",
+          email: "ognjen.babic@outlook.com",
+          phone: "+31 6 2978 1578",
+          linkedin: "https://www.linkedin.com/in/ogibabic/"
+        };
+
+        const LANGUAGES = [
+            { name: "Dutch", level: "Native" },
+            { name: "Serbian", level: "Native" },
+            { name: "English", level: "Professional" }
+        ];
+
+        const METHODOLOGY = [
+          { icon: Icons.Brain, title: "Psychologist's Edge", content: "People don't buy products; they buy solutions to emotional pains. I use professional inquiry to uncover the 'why' behind the 'what'." },
+          { icon: Icons.Users, title: "Culture Builder", content: "Revenue is a lagging indicator of culture. I focus on psychological safety to build self-sustaining engines of success." },
+          { icon: Icons.Compass, title: "Strategic Navigator", content: "Thriving in ambiguity. From opening new divisions to forging alliances with major partners, I build the plane while flying it." }
+        ];
+
+        const STORIES = [
+          {
+            id: "strategy",
+            category: "Market Strategy",
+            title: "Cracking the Dynamics Code",
+            stat: "0 to 1 GTM",
+            story: "Opening a new market division isn't just about selling a tool; it's about finding shared value. I forged a strategic alliance with a Gold Partner, embedding our product into their methodology. It’s about connection—and sometimes, bonding over LEGO sets.",
+            image: "5.jpg",
+            imageCaption: "Building partnerships (and skylines) at the Plauti booth."
+          },
+          {
+            id: "revenue",
+            category: "Revenue Growth",
+            title: "The €1 Million Achievement",
+            stat: "€1M+ Revenue",
+            story: "Closing over €1M in new business during my time as an AE came down to one thing: active listening. It wasn't about the pitch, but about understanding the stakeholder map better than anyone else.",
+            image: "4.jpg",
+            imageCaption: "The art of the conversation: Listening first, selling second."
+          },
+          {
+            id: "people",
+            category: "Leadership",
+            title: "The Coaching Turnaround",
+            stat: "Top Performance",
+            story: "Transitioning from peer to leader, I focused on individual coaching. The result? A team that didn't just hit quota, but crushed it. Building a team is easy; building a culture where everyone wins is the real challenge.",
+            image: "3.jpg",
+            imageCaption: "The 'Clean Data' Squad: Winning together at Dreamforce."
+          }
+        ];
+
+        const PASSIONS = [
+          {
+            title: "The Posbank Climb",
+            desc: "Cycling isn't just fitness; it's my meditation. The hills of Posbank are where I solve my toughest work problems and find clarity.",
+            image: "6.jpg",
+            imageCaption: "Sunset rides on the Posbank."
+          },
+          {
+            title: "Family Anchors",
+            desc: "My drive to succeed starts here. Fatherhood has taught me more about patience, negotiation, and 'why' we do what we do than any sales training.",
+            image: "7.jpg",
+            imageCaption: "The evening shift. My biggest motivation."
+          },
+           {
+            title: "The Energy of the Crowd",
+            desc: "There is something magical about 50,000 people singing in unison. Whether it's Coldplay or a packed conference, I feed off that collective energy.",
+            image: "2.jpg",
+            imageCaption: "Music of the Spheres Tour - Recharging the battery."
+          },
+           {
+            title: "Lifelong Bonds",
+            desc: "In business and in life, I play the long game. These aren't just friends; they are the community that keeps me grounded.",
+            image: "1.jpg",
+            imageCaption: "Good times with the day ones."
+          }
+        ];
+
+        // --- COMPONENTS ---
+
+        const Hero = ({ darkMode, setDarkMode }) => (
+          <section className="relative min-h-[90vh] flex flex-col justify-center px-6 pt-20 overflow-hidden">
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-teal-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 animate-float" />
+            <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3 animate-float" style={{animationDelay: '2s'}} />
+
+            <nav className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center max-w-7xl mx-auto w-full z-20">
+              <div className="font-bold text-xl tracking-tighter">OB<span className="text-teal-600">.</span></div>
+              <button onClick={() => setDarkMode(!darkMode)} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors">
+                {darkMode ? <Icons.Sun className="w-5 h-5" /> : <Icons.Moon className="w-5 h-5" />}
+              </button>
+            </nav>
+
+            <div className="max-w-5xl mx-auto w-full z-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-600 dark:text-slate-300 mb-8 backdrop-blur-sm">
+                <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
+                Beyond the Resume
+              </div>
+              
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-[0.95] mb-8 text-slate-900 dark:text-white">
+                The Psychologist <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-600">
+                  in the Boardroom.
+                </span>
+              </h1>
+              
+              <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed mb-12">
+                {PROFILE.manifesto}
+              </p>
+
+              <div className="flex flex-wrap gap-4">
+                 <button onClick={() => document.getElementById('impact').scrollIntoView({behavior: 'smooth'})} className="px-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-full font-bold hover:scale-105 transition-transform flex items-center gap-2 shadow-lg shadow-slate-900/20">
+                  See the Impact <Icons.ArrowRight className="w-4 h-4" />
+                </button>
+                <a href={PROFILE.linkedin} target="_blank" className="px-8 py-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-2">
+                  <Icons.Linkedin className="w-4 h-4" /> LinkedIn
+                </a>
+              </div>
+            </div>
+
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-slate-400">
+              <Icons.ChevronDown className="w-6 h-6" />
+            </div>
+          </section>
+        );
+
+        const Roots = () => (
+            <section className="py-24 px-6 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
+                <div className="max-w-4xl mx-auto">
+                    <div className="flex flex-col md:flex-row gap-12 items-center">
+                        <div className="flex-1 space-y-6">
+                            <div className="inline-flex items-center gap-2 text-teal-600 dark:text-teal-400 font-bold uppercase tracking-widest text-sm">
+                                <Icons.Globe className="w-4 h-4" /> Origin Story
+                            </div>
+                            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">
+                                Dutch Pragmatism. <br/>
+                                <span className="text-slate-400">Serbian Spirit.</span>
+                            </h2>
+                            <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
+                                I come from a hardworking family. As an only child, I was taught discipline, fairness, and the old Serbian proverb: <em>"Think with your head."</em>
+                            </p>
+                            <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
+                                My parents fled their country to build a new life. Seeing them learn a new language and build successful careers in the Netherlands instilled a hunger in me. Those opportunities were taken from them for a time, so I refuse to waste mine.
+                            </p>
+                            <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
+                                That's why I excel at what I do. I play for the long game, because family—and the people you count on—are what matter most.
+                            </p>
+                        </div>
+                        
+                        <div className="w-full md:w-1/3 bg-slate-50 dark:bg-slate-800 p-8 rounded-2xl border border-slate-100 dark:border-slate-700">
+                            <h3 className="font-bold text-slate-900 dark:text-white mb-4">Languages</h3>
+                            <div className="space-y-3">
+                                {LANGUAGES.map((lang, i) => (
+                                    <div key={i} className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-2 last:border-0">
+                                        <span className="text-slate-600 dark:text-slate-300">{lang.name}</span>
+                                        <span className="text-xs font-bold bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 px-2 py-1 rounded">{lang.level}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        );
+
+        const Blueprint = () => (
+          <section className="py-24 px-6 bg-white dark:bg-slate-900/50 relative">
+            <div className="max-w-6xl mx-auto">
+              <div className="mb-16">
+                <h2 className="text-3xl font-bold mb-4 text-slate-900 dark:text-white">My Blueprint</h2>
+                <div className="h-1 w-20 bg-teal-500 rounded-full" />
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-8">
+                {METHODOLOGY.map((item, idx) => (
+                  <div key={idx} className="p-8 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:border-teal-200 dark:hover:border-teal-900 transition-colors">
+                    <div className="w-12 h-12 bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 rounded-xl flex items-center justify-center mb-6">
+                      <item.icon className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-xl font-bold mb-3 text-slate-900 dark:text-white">{item.title}</h3>
+                    <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                      {item.content}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+
+        const Impact = () => (
+          <section id="impact" className="py-24 px-6 bg-slate-50 dark:bg-[#0f172a]">
+            <div className="max-w-6xl mx-auto">
+              <div className="mb-16">
+                <h2 className="text-4xl md:text-5xl font-black mb-4 text-slate-900 dark:text-white">The Highlight Reel</h2>
+                <p className="text-slate-600 dark:text-slate-400 max-w-lg text-lg">
+                  Real outcomes, real stories.
+                </p>
+              </div>
+
+              <div className="space-y-12">
+                {STORIES.map((story, idx) => (
+                  <div key={story.id} className={`flex flex-col ${idx % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} gap-8 items-stretch`}>
+                    
+                    {/* Text Card */}
+                    <div className="flex-1 bg-white dark:bg-slate-800 rounded-3xl p-8 md:p-12 shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-500">
+                       <div className="absolute top-0 right-0 bg-slate-100 dark:bg-slate-700 px-4 py-2 rounded-bl-2xl text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                        {story.category}
+                      </div>
+                      <div className="text-teal-600 dark:text-teal-400 font-black text-4xl mb-6">
+                        {story.stat}
+                      </div>
+                      <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
+                        {story.title}
+                      </h3>
+                      <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-lg">
+                        {story.story}
+                      </p>
+                      <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-teal-400 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
+                    </div>
+
+                    {/* Image Card */}
+                    <div className="flex-1 relative h-72 md:h-auto rounded-3xl overflow-hidden shadow-lg group bg-slate-200 dark:bg-slate-800">
+                       <img 
+                         src={story.image} 
+                         alt={story.title}
+                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                         onError={(e) => {
+                           e.target.style.display='none'; 
+                           e.target.nextSibling.style.display='flex';
+                         }} 
+                       />
+                       
+                       {/* Error State (Instructions) */}
+                       <div className="hidden absolute inset-0 w-full h-full flex-col items-center justify-center text-center p-6 bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-300 dark:border-slate-600">
+                          <div className="text-3xl mb-2">📸</div>
+                          <p className="text-sm font-bold text-slate-500 dark:text-slate-400">Photo Missing</p>
+                          <p className="text-xs text-slate-400 mt-1">Save your photo as:</p>
+                          <code className="mt-2 px-2 py-1 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 font-mono text-sm text-teal-600 dark:text-teal-400 font-bold">
+                            {story.image.replace('./', '')}
+                          </code>
+                       </div>
+                       
+                       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 pt-20 pointer-events-none">
+                          <p className="text-white text-sm font-medium opacity-90">{story.imageCaption}</p>
+                       </div>
+                    </div>
+
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+
+        const LifeOffline = () => (
+          <section className="py-24 px-6 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-16">
+                <h2 className="text-3xl font-bold mb-4 text-slate-900 dark:text-white">Life Offline</h2>
+                <p className="text-slate-600 dark:text-slate-400">The fuel that keeps the engine running.</p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-8">
+                {PASSIONS.map((passion, idx) => (
+                  <div key={idx} className="group relative rounded-3xl overflow-hidden shadow-lg bg-slate-100 dark:bg-slate-800">
+                    <div className="h-64 overflow-hidden relative">
+                      <img 
+                        src={passion.image} 
+                        alt={passion.title} 
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        onError={(e) => {
+                           e.target.style.display='none'; 
+                           e.target.nextSibling.style.display='flex';
+                         }} 
+                      />
+                       {/* Error State (Instructions) */}
+                       <div className="hidden absolute inset-0 w-full h-full flex-col items-center justify-center text-center p-6 bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-300 dark:border-slate-600">
+                          <div className="text-3xl mb-2">📸</div>
+                          <p className="text-sm font-bold text-slate-500 dark:text-slate-400">Photo Missing</p>
+                          <p className="text-xs text-slate-400 mt-1">Save your photo as:</p>
+                          <code className="mt-2 px-2 py-1 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 font-mono text-sm text-teal-600 dark:text-teal-400 font-bold">
+                            {passion.image.replace('./', '')}
+                          </code>
+                       </div>
+                    </div>
+                    
+                    <div className="p-8">
+                      <h3 className="text-2xl font-bold mb-3 text-slate-900 dark:text-white">{passion.title}</h3>
+                      <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+                        {passion.desc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+
+        const Footer = () => (
+          <footer className="py-12 px-6 bg-slate-50 dark:bg-[#0a0f1d]">
+            <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+              <div>
+                <h4 className="font-bold text-lg mb-1 text-slate-900 dark:text-white">Ogi Babić</h4>
+                <p className="text-slate-500 text-sm">Arnhem, Netherlands</p>
+              </div>
+              <div className="flex gap-6">
+                <a href={`mailto:${PROFILE.email}`} className="text-slate-600 dark:text-slate-400 hover:text-teal-600 transition-colors flex items-center gap-2">
+                  <Icons.Mail className="w-4 h-4" /> Email Me
+                </a>
+                <a href={`tel:${PROFILE.phone}`} className="text-slate-600 dark:text-slate-400 hover:text-teal-600 transition-colors flex items-center gap-2">
+                  <Icons.Phone className="w-4 h-4" /> Call Me
+                </a>
+              </div>
+            </div>
+          </footer>
+        );
+
+        function App() {
+          const [darkMode, setDarkMode] = useState(false);
+
+          useEffect(() => {
+            if (darkMode) document.documentElement.classList.add('dark');
+            else document.documentElement.classList.remove('dark');
+          }, [darkMode]);
+
+          return (
+            <div className="min-h-screen bg-[#fafafa] dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 font-sans transition-colors duration-500">
+              <Hero darkMode={darkMode} setDarkMode={setDarkMode} />
+              <Roots />
+              <Blueprint />
+              <Impact />
+              <LifeOffline />
+              <Footer />
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
