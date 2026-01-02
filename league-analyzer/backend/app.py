@@ -40,7 +40,7 @@ app = Flask(__name__)
 CORS(app, origins="*")
 
 # Configuration
-RIOT_API_KEY = os.environ.get('RIOT_API_KEY', 'RGAPI-ffa11104-de53-48dd-9370-7356e869ec26')
+RIOT_API_KEY = os.environ.get('RIOT_API_KEY', 'RGAPI-16ae1ca0-80f7-4c00-bb49-05746573f32f')
 
 # Region routing for Riot API
 REGION_ROUTING = {
