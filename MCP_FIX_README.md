@@ -1,7 +1,7 @@
 # Salesforce MCP Disconnect Fix
 
 ## Problem
-You were getting this error:
+You're getting this error:
 ```
 salesforce
 failed
@@ -12,44 +12,90 @@ Error: Server disconnected
 ```
 
 ## Root Cause
-The Salesforce MCP server was disconnecting because:
+The Salesforce MCP server is disconnecting because:
 
-1. **Invalid org name**: The configuration used "demo-org" which isn't a valid authenticated Salesforce org
-2. **Missing authentication**: The Salesforce CLI wasn't authenticated with any real Salesforce org
+1. **Invalid org name**: The configuration uses "demo-org" which isn't a valid authenticated Salesforce org
+2. **Missing authentication**: The Salesforce CLI isn't authenticated with any real Salesforce org
 3. **Unnecessary for this project**: This is a static portfolio website with no Salesforce integration
+4. **Configuration location**: The MCP server settings are in Claude Code's web UI, not in project files
 
-## Solution Applied
+## Solution: Update MCP Settings in Claude Code Web UI
 
-I've created a `.claude/mcp-config.json` file that **disables** the Salesforce MCP server since it's not needed for this portfolio website.
+Since this is a static portfolio website with no Salesforce needs, you should **disable the Salesforce MCP server** in Claude Code's settings:
 
-## If You Need Salesforce MCP (Optional)
+### Step 1: Access MCP Settings
+1. In Claude Code (web), click on the **Settings** icon (⚙️) or menu
+2. Look for **MCP Servers** or **Integrations** section
+3. Find the **Salesforce** MCP server configuration
 
-If you actually need Salesforce integration in the future, follow these steps:
+### Step 2: Disable Salesforce MCP
+**Option A: Disable it**
+- Toggle off or disable the Salesforce MCP server
+- Save your settings
+
+**Option B: Remove it**
+- Delete the Salesforce MCP server configuration entirely
+- Save your settings
+
+### Step 3: Restart/Refresh
+- Refresh your Claude Code session
+- The error should now be gone
+
+## If You Need Salesforce MCP in the Future (Optional)
+
+If you actually need Salesforce integration later, follow these steps to properly configure it:
 
 ### 1. Install Salesforce CLI
 ```bash
 npm install -g @salesforce/cli
 ```
 
-### 2. Authenticate with Your Org
+### 2. Authenticate with Your Salesforce Org
 ```bash
+# Authenticate and create an alias for your org
 sf org login web --alias my-org
-# Or for a specific instance:
+
+# Or for a specific Salesforce instance:
 sf org login web --alias my-org --instance-url https://your-instance.salesforce.com
 ```
 
 ### 3. Verify Authentication
 ```bash
+# List all authenticated orgs
 sf org list
+
+# You should see your org listed with the alias you created
 ```
 
-### 4. Update MCP Configuration
-Edit `.claude/mcp-config.json` and:
-- Change `"disabled": true` to `"disabled": false`
-- Replace `"YOUR_ORG_ALIAS_HERE"` with your actual org alias (e.g., "my-org")
+### 4. Update MCP Configuration in Claude Code Web UI
+Go to Claude Code settings and update the Salesforce MCP server configuration:
 
-### 5. Restart Claude Code
-The MCP server should now connect successfully.
+**Replace:**
+```
+--orgs demo-org
+```
+
+**With:**
+```
+--orgs my-org
+```
+
+(Use the actual alias you created in step 2)
+
+**Or use your default target org:**
+```
+--orgs DEFAULT_TARGET_ORG
+```
+
+### 5. Recommended Configuration
+In Claude Code's MCP settings, use this configuration:
+```
+Command: /usr/local/bin/npx
+Arguments: -y @salesforce/mcp@latest --orgs my-org --toolsets all
+```
+
+### 6. Restart Claude Code
+The MCP server should now connect successfully to your authenticated Salesforce org.
 
 ## Alternative: Use Default Target Org
 
