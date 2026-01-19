@@ -9,8 +9,7 @@
         "demo-org",
         "--toolsets",
         "all"
-      ],
-      "env": {}
+      ]
     }
   }
 }
