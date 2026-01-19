@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "MCP Server Configuration - Fixed Salesforce MCP Disconnect Issue",
+  "mcpServers": {
+    "salesforce": {
+      "disabled": true,
+      "notes": [
+        "This Salesforce MCP configuration has been disabled because:",
+        "1. This is a static portfolio website with no Salesforce integration needed",
+        "2. The 'demo-org' was not a valid authenticated Salesforce org",
+        "3. To re-enable, authenticate with Salesforce CLI first using: sf org login web",
+        "4. Then update the configuration below with your actual org alias"
+      ],
+      "command": "/usr/local/bin/npx",
+      "args": [
+        "-y",
+        "@salesforce/mcp@latest",
+        "--orgs",
+        "YOUR_ORG_ALIAS_HERE",
+        "--toolsets",
+        "all"
+      ],
+      "env": {}
+    }
+  },
+  "instructions": {
+    "how_to_fix_salesforce_mcp": {
+      "step1": "Authenticate with Salesforce CLI: sf org login web --alias my-org",
+      "step2": "Update the 'YOUR_ORG_ALIAS_HERE' in this config with your org alias",
+      "step3": "Set 'disabled: false' to enable the MCP server",
+      "step4": "Restart Claude Code to apply changes",
+      "alternative": "If you don't need Salesforce integration, leave it disabled"
+    },
+    "references": [
+      "Salesforce MCP Documentation: https://github.com/salesforcecli/mcp",
+      "Troubleshooting: https://dev.to/sudhakar6/the-disconnected-dilemma-a-mac-users-journey-to-connecting-the-gemini-cli-and-salesforce-mcp-2ack"
+    ]
+  }
+}
