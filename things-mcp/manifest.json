@@ -1,0 +1,104 @@
+{
+  "name": "things-mcp",
+  "version": "0.6.0",
+  "description": "Things 3 integration for Claude Desktop - comprehensive task management capabilities",
+  "author": "Hal Dick",
+  "license": "MIT",
+  "keywords": ["things", "tasks", "productivity", "macos"],
+  "platforms": ["darwin"],
+  "minClaudeVersion": "0.10.0",
+  "server": {
+    "command": "uv",
+    "args": ["run", "--with", "fastmcp", "things_server.py"]
+  },
+  "tools": [
+    {
+      "name": "get_inbox",
+      "description": "Get todos from Inbox"
+    },
+    {
+      "name": "get_today",
+      "description": "Get todos due today"
+    },
+    {
+      "name": "get_upcoming",
+      "description": "Get upcoming todos"
+    },
+    {
+      "name": "get_anytime",
+      "description": "Get todos from Anytime list"
+    },
+    {
+      "name": "get_someday",
+      "description": "Get todos from Someday list"
+    },
+    {
+      "name": "get_logbook",
+      "description": "Get completed todos from Logbook"
+    },
+    {
+      "name": "get_trash",
+      "description": "Get trashed todos"
+    },
+    {
+      "name": "get_todos",
+      "description": "Get todos, optionally filtered by project"
+    },
+    {
+      "name": "get_projects",
+      "description": "Get all projects"
+    },
+    {
+      "name": "get_areas",
+      "description": "Get all areas"
+    },
+    {
+      "name": "get_tags",
+      "description": "Get all tags"
+    },
+    {
+      "name": "get_tagged_items",
+      "description": "Get items with a specific tag"
+    },
+    {
+      "name": "get_headings",
+      "description": "Get headings from Things"
+    },
+    {
+      "name": "search_todos",
+      "description": "Search todos by title or notes"
+    },
+    {
+      "name": "search_advanced",
+      "description": "Advanced todo search with multiple filters"
+    },
+    {
+      "name": "get_recent",
+      "description": "Get recently created items"
+    },
+    {
+      "name": "add_todo",
+      "description": "Create a new todo"
+    },
+    {
+      "name": "add_project",
+      "description": "Create a new project"
+    },
+    {
+      "name": "update_todo",
+      "description": "Update an existing todo"
+    },
+    {
+      "name": "update_project",
+      "description": "Update an existing project"
+    },
+    {
+      "name": "show_item",
+      "description": "Show a specific item or list"
+    },
+    {
+      "name": "search_items",
+      "description": "Search for items in Things"
+    }
+  ]
+}
