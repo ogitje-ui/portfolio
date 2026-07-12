@@ -25,6 +25,22 @@ Every endpoint below is free, requires no API key, and was tested working (July 
 | Options put/call (by OI) | `https://www.deribit.com/api/v2/public/get_book_summary_by_currency?currency=BTC&kind=option` | Sum open_interest by instrument suffix -P vs -C; contrarian thresholds in derivatives-timing.md |
 | CME basis | Yahoo `BTC=F` (see cross-asset syntax) vs spot | (futures − spot)/spot: healthy contango 5–15% annualized = normal institutional demand; flat/backwardation = institutions defensive; steep contango >20% = overheated |
 
+## On-chain (lenses 1, 4) — Coin Metrics community API, free, no key
+
+Endpoint: `https://community-api.coinmetrics.io/v4/timeseries/asset-metrics?assets=btc&metrics=<list>&frequency=1d&sort=time&start_time=<date>` (community tier = 31 BTC metrics, ~1-day lag; realized cap raw is paid but the ratios below are free).
+
+| Metric | Read |
+|---|---|
+| `CapMVRVCur` — MVRV ratio | THE on-chain cycle-valuation anchor for lens 1: market cap ÷ realized cap. Historical cycle tops printed ~3.5–4+, bear bottoms <1, ~1.0–1.5 = accumulation/mid-bear territory. Slow signal — read weekly, adjusts cycle-phase confidence |
+| `FlowInExUSD` / `FlowOutExUSD` | Exchange netflow (in − out): sustained net inflows = coins moving to exchanges to be sold (bearish); net outflows = withdrawal to cold storage (accumulation). Feeds lens 4 alongside ETF flows |
+| `SplyExNtv` / `SplyExUSD` | Total supply sitting on exchanges — the stock version of the flow above; multi-week downtrend = supply squeeze backdrop |
+| `AdrActCnt`, `TxCnt` | Network activity/usage trend — divergence from price is the signal |
+| `HashRate` | Miner health; capitulation-style hashrate drops have historically clustered near cycle lows |
+
+## Liquidations (lens 5) — OKX public, free, no key
+
+`https://www.okx.com/api/v5/public/liquidation-orders?instType=SWAP&uly=BTC-USD&state=filled` — recent forced-liquidation prints (side, size, price). Single-venue proxy, not aggregate: use it to confirm *whether* a move was liquidation-driven and which side got flushed, and to spot cascades in progress (cluster of same-side prints). For USDT-margined add `uly=BTC-USDT`.
+
 ## Sentiment (lenses 5, 7 cross-check)
 
 | Metric | Endpoint | Read |
@@ -47,10 +63,20 @@ Yahoo Finance chart API (browser User-Agent required): `https://query1.finance.y
 ## Composite reading order for a briefing
 
 1. Price + premium + ETF flows → is real money buying or selling? (lens 4)
-2. Funding + OI trend + long/short + taker flow → how is leverage positioned, who gets squeezed? (lens 5)
+2. Funding + OI trend + long/short + taker flow + liquidation prints → how is leverage positioned, who gets squeezed? (lens 5)
 3. DVOL + F&G + put/call → is the crowd fearful or greedy, and is vol cheap or expensive? (contrarian layer)
 4. Cross-asset regime table → does the macro tape confirm or veto? (lens 8)
 5. News + calendar → what can interrupt today? (lenses 6, 7)
-6. Stablecoin supply + dominance + ETH/BTC → slow-moving backdrop, weekly relevance not daily.
+6. Weekly backdrop: stablecoin supply, dominance, ETH/BTC, MVRV, exchange netflow/supply → slow-moving, weekly relevance not daily.
 
 Signals only count when the faster layers (1–2) and the regime layer (4) agree; sentiment extremes (3) time entries within that agreement.
+
+## Open-source stacks (for going deeper than REST endpoints)
+
+If the endpoint list above ever stops being enough, these maintained open-source projects rebuild Coinglass-class data from primary sources:
+
+- **cryptofeed** (`github.com/bmoscon/cryptofeed`, Python) — real-time websocket aggregator across dozens of exchanges: trades, order books, **funding, open interest, and liquidation streams**. This is the genuine open-source Coinglass engine; requires running a persistent process (a small VPS or always-on machine), so it's a self-hosting upgrade path rather than something an ephemeral session can use.
+- **CCXT** (`github.com/ccxt/ccxt`, Python/JS) — the standard unified REST/WS client for 100+ exchanges (`fetchFundingRate`, `fetchOpenInterest`, order books, OHLCV). Best way to widen venue coverage beyond the OKX/Deribit/Kraken/Coinbase endpoints used here without writing bespoke clients.
+- **OpenBB** (`github.com/OpenBB-finance/OpenBB`, Python) — open-source financial terminal aggregating crypto + macro + equity providers under one API; useful if the cross-asset layer should grow past Yahoo.
+- **Hyperliquid public API** (`api.hyperliquid.xyz/info`, no key) — a fully open derivatives venue: funding, OI, and liquidation data with no auth at all; useful as a second derivatives venue for confirming OKX readings.
+- **coinglass-api** (`github.com/dineshpinto/coinglass-api`, Python) — clean wrapper for the real Coinglass API if a paid/free-tier Coinglass key is ever obtained; the fastest route to true *aggregated* liquidation heatmaps.

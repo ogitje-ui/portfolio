@@ -31,6 +31,7 @@ Run these in order. Each produces one line of output; the synthesis step at the 
 - Compute months since/until the nearest halving.
 - Historical pattern (see `references/btc-cycle-history.md` for the full table): bull tops have clustered 12–18 months post-halving; peak-to-trough bear drawdowns have run 77–85%; bear bottoms have historically formed before the next halving.
 - **State explicitly that this pattern is contested for the current cycle** — the post-2024-halving year broke the "always green" pattern for the first time, and ETF/institutional flows are cited as a structural change. Treat cycle position as a *prior*, not a rule.
+- **On-chain valuation anchor**: check live MVRV (free via Coin Metrics community API, see `references/live-data-quickref.md`) — historical cycle tops ~3.5–4+, bear bottoms <1, ~1.0–1.5 = accumulation/mid-bear. Date-based cycle timing and MVRV agreeing raises phase confidence; disagreeing lowers it.
 - Output: label the likely phase — Accumulation / Early Markup / Late Markup-Euphoria / Distribution / Markdown-Bear — with a confidence level, not certainty.
 
 ### 2. Price action & market structure (Wyckoff / PA lens) — weight ~25%, highest
