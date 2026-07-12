@@ -1,11 +1,11 @@
 ---
 name: crypto-market-cycle-trader
-description: Use when analyzing Bitcoin or crypto markets for trading decisions — e.g. "analyze BTC", "where are we in the cycle", "is this a good entry/exit", "build a trading plan", "read the market structure", "check funding/OI before I lever up", "when should I look for entries", "what's the put/call ratio saying", "check Coinbase premium", "how are the ETFs flowing". Synthesizes technical analysis (TA), Wyckoff-style price action (PA), the BTC 4-year halving cycle, spot demand flow (Coinbase Premium Index, spot BTC ETF net inflows/outflows), futures/options positioning (funding, open interest, live put/call ratio), the TradFi + crypto macro/volatility calendar (FOMC, CPI/PPI, NFP, witching days, options/futures expiries), and an optional astrological timing overlay into one structured playbook drawing on the methods of well-known crypto traders (Trader Mayne, TraderXO, and others). Not financial advice — an analytical checklist, not a signal generator.
+description: Use when analyzing Bitcoin or crypto markets for trading decisions, scalp or swing entries, or reacting to breaking news — e.g. "analyze BTC", "where are we in the cycle", "is this a good entry/exit", "build a trading plan", "read the market structure", "check funding/OI before I lever up", "when should I look for entries", "what's the put/call ratio saying", "check Coinbase premium", "how are the ETFs flowing", "should I trade this headline", "Iran/Israel/war/tariff headline just hit". Synthesizes technical analysis (TA), Wyckoff-style price action (PA), the BTC 4-year halving cycle, spot demand flow (Coinbase Premium Index, spot BTC ETF net inflows/outflows), futures/options positioning (funding, open interest, live put/call ratio), the TradFi + crypto macro/volatility calendar (FOMC, CPI/PPI, NFP, witching days, options/futures expiries), geopolitical/breaking-news headline risk (war, tariffs, regulatory shocks) with a scalp-oriented Headline Trade Protocol, and an optional astrological timing overlay into one structured playbook drawing on the methods of well-known crypto traders (Trader Mayne, TraderXO, and others). Not financial advice — an analytical checklist, not a signal generator.
 ---
 
 # Crypto Market Cycle Trader
 
-A structured framework for reading Bitcoin/crypto markets by layering seven lenses, each weighted by how much *evidence* it actually carries. Evidence-heavy lenses (price action, TA, cycle context, spot demand flow, derivatives, macro/volatility calendar) drive the trade thesis and its timing. The astrology lens is a low-weight sentiment/volatility overlay only — it never drives direction on its own.
+A structured framework for reading Bitcoin/crypto markets by layering eight lenses, each weighted by how much *evidence* it actually carries. Evidence-heavy lenses (price action, TA, cycle context, spot demand flow, derivatives, macro/volatility calendar, geopolitical headline risk) drive the trade thesis and its timing. The astrology lens is a low-weight sentiment/volatility overlay only — it never drives direction on its own.
 
 ## Who this framework draws from
 
@@ -15,17 +15,25 @@ A structured framework for reading Bitcoin/crypto markets by layering seven lens
 
 This is methodology synthesis, not copy-trading. See `references/trader-playbooks.md` for the expanded notes on each.
 
-## The seven-lens framework
+## Timeframe adaptation: scalp vs. swing
+
+This framework serves both a several-hours scalp and a multi-day swing — read each lens on a timeframe matched to the trade being considered, not a fixed weekly cadence:
+
+- **Scalp (minutes–hours)**: lens 2 (PA) on the 5m/15m/1h chart for structure and liquidity sweeps; lens 7 (geopolitical/headline risk) is frequently the *primary trigger* — see its Headline Trade Protocol, which runs as its own fast-path and does not wait for the full weighted synthesis below. Lenses 1, 4, 5 (cycle, spot flow, derivatives) are too slow-moving to trigger a scalp themselves — use them only as a quick background check ("does this scalp fight the higher-timeframe trend?").
+- **Swing (days)**: run the full eight-lens weighted synthesis at the daily/4h timeframe as designed below; cycle context and spot flow carry real weight here since they move on a similar timescale.
+- Either way, lens 6 (scheduled macro calendar) tells you whether you're trading into a known volatility window regardless of style.
+
+## The eight-lens framework
 
 Run these in order. Each produces one line of output; the synthesis step at the end combines them.
 
-### 1. Cycle context (macro timing) — weight ~10%
+### 1. Cycle context (macro timing) — weight ~5%
 - Compute months since/until the nearest halving.
 - Historical pattern (see `references/btc-cycle-history.md` for the full table): bull tops have clustered 12–18 months post-halving; peak-to-trough bear drawdowns have run 77–85%; bear bottoms have historically formed before the next halving.
 - **State explicitly that this pattern is contested for the current cycle** — the post-2024-halving year broke the "always green" pattern for the first time, and ETF/institutional flows are cited as a structural change. Treat cycle position as a *prior*, not a rule.
 - Output: label the likely phase — Accumulation / Early Markup / Late Markup-Euphoria / Distribution / Markdown-Bear — with a confidence level, not certainty.
 
-### 2. Price action & market structure (Wyckoff / PA lens) — weight ~30%, highest
+### 2. Price action & market structure (Wyckoff / PA lens) — weight ~25%, highest
 - Identify the Wyckoff phase on the relevant timeframe (accumulation range with spring, sign-of-strength, markup; or distribution range with upthrust, sign-of-weakness, markdown).
 - Map key support/resistance and liquidity pools: equal highs/lows, prior range extremes, untested order blocks.
 - Look for liquidity sweeps / stop hunts *before* trusting a move — a break of structure on thin volume that immediately reverses is a sweep, not a breakout.
@@ -69,7 +77,7 @@ Use the **5–10 day moving average** of the ratio, not a single reading — dai
 
 Full detail and a walk-through in `references/derivatives-timing.md`.
 
-### 6. Macro & volatility calendar (event-risk timing) — weight ~15%
+### 6. Macro & volatility calendar (scheduled event-risk timing) — weight ~10%
 Crypto trades as a risk asset and is directly sensitive to TradFi macro prints and derivatives-expiry mechanics. This lens doesn't generate direction on its own — its job is to flag *when* volatility is structurally elevated (or artificially suppressed) so entries/exits are timed around it rather than into it.
 
 - **FOMC meeting days** (rate decision 14:00 ET + press conference 14:30 ET) — the single highest-impact scheduled event for both TradFi and crypto; historically produces outsized, often two-sided ("whipsaw then trend") moves.
@@ -83,19 +91,54 @@ Rule of thumb: avoid opening *new* directional risk in the 24–48h window immed
 
 Full 2026 dates and a weekly-event checklist in `references/macro-calendar.md`.
 
-### 7. Astrological timing overlay — optional, sentiment-only, weight 0% on direction
+### 7. Geopolitical & breaking macro news (headline risk) — weight ~15%, and the primary scalp trigger
+Distinct from lens 6: this covers *unscheduled* breaking news — war, tariffs, surprise central-bank commentary, regulatory action, exchange-specific shocks — the stuff actually traded on a headline basis. It carries real weight in the structural synthesis (a live war or tariff shock should shift the swing-level bias), and it also runs as its own standalone fast-path for scalping, described below.
+
+**Event categories & default BTC reaction** — grounded in real 2025 episodes, not just theory:
+- **War/military escalation**: default is a sharp *risk-off* selloff, not a safe-haven bid. When Israel struck Iran on Jun 13, 2025, BTC fell ~4% (~$107k→$103k) within a day with over $1B liquidated; the U.S. strikes on Fordow that same month triggered a similar dip. Both **recovered within days** once the conflict didn't broaden, and the Jun 24 ceasefire headline itself produced a rally back above $105k. Pattern: sell the escalation headline, expect the move to fade/reverse on any de-escalation signal.
+- **Tariffs / trade-war headlines**: same risk-off mechanic, often the sharpest category because of leverage cascades — Trump's Apr 2, 2025 "Liberation Day" tariffs took BTC from ~$88k to ~$82k, then reversed hard on the Apr 9 90-day-pause headline; the Oct 2025 100%-China-tariff announcement dropped BTC ~15% (~$122.5k→~$104.6k) with a record ~$19B liquidated. Cross-check lens 5 — these episodes are exactly what an "OI stacking, expect a sharp move" derivatives read predicts.
+- **Central bank surprise commentary**: same mechanic as lens 6's FOMC/CPI entries but unplanned — hawkish surprise is risk-off, dovish surprise is risk-on, just without calendar warning.
+- **Regulatory/legislative action**: more idiosyncratic than macro-correlated — can be sharply bullish (e.g. a Senate crypto bill headline) or bearish depending on content; read the specific headline rather than assuming a default direction.
+- **Exchange/protocol-specific shocks** (hacks, insolvency, depegs): idiosyncratic crypto-only risk-off; treat as a pure lens-2/lens-5 liquidity event, no geopolitical read needed.
+- **Systemic TradFi stress** (bank failures, currency crises): the one category where BTC has historically decoupled *positively* from broader risk-off — a "digital gold" bid can dominate instead of the usual high-beta selloff. This is the exception to the default risk-off assumption above.
+
+**The spike-fade-recover mechanic**: every case above followed the same shape — (1) a sharp initial move within minutes to hours, amplified well beyond "fundamental" impact by liquidation cascades, (2) a stall once initial forced selling/buying is absorbed, (3) a partial-to-full retrace over the following hours to days as the market reprices actual escalation risk vs. the initial worst case. The scalping edge is rarely in chasing the first candle — it's in fading the overshoot once lens 2 shows a stall/reversal, or catching continuation only after lens 5 shows OI/liquidations have already cleared.
+
+**Live monitoring, tested working, no key required**:
+- **Google News RSS search** (most reliable): `https://news.google.com/rss/search?q=<topic>+when:1h&hl=en-US&gl=US&ceid=US:en` — swap `when:1h`/`when:1d` for the window, works for any topic (Iran, Fed, tariffs, a specific exchange).
+- **CoinDesk RSS**: `https://www.coindesk.com/arc/outboundfeeds/rss/`
+- **The Block RSS**: `https://www.theblock.co/rss.xml`
+- **GDELT** (`api.gdeltproject.org/api/v2/doc/doc`) — free, no key, but rate-limited to ~1 request/5s and unreliable from this environment specifically; treat as backup, not primary.
+- **Exa** (if a key is supplied via environment variable, never hardcoded) — better for digging into a story once it breaks than for the first alert.
+
+**Headline Trade Protocol** (runs standalone, doesn't wait for the full synthesis):
+1. **Verify** — primary source (Reuters/AP/official statement) or unconfirmed rumor? Wait for a second confirming source before trading; costs 1-2 minutes, avoids most fake-headline whipsaws.
+2. **Classify magnitude** — Tier 1 (major war escalation, systemic threat, surprise Fed action) moves the whole market; Tier 2 (regional/contained conflict, single-country tariff) moves crypto but smaller/shorter; Tier 3 (rhetoric without action) is usually noise — don't trade it directly.
+3. **Don't chase the first 1–5 minute candle** — that's the illiquid, spread-widened, most overshoot-prone window. Wait for a defined lower-timeframe structure: a stall/sweep-and-reclaim (fade setup) or a clean continuation after brief consolidation (trend setup).
+4. **Check alignment with the structural bias** from lenses 1–6: a headline fighting the existing higher-timeframe trend is a smaller, quicker counter-trend scalp; one agreeing with it is higher-conviction and can be sized/held more normally.
+5. **Check lens 5** — has forced selling/buying already happened (post-cascade, better fade entry) or is OI still building (avoid catching a falling knife mid-cascade)?
+6. **Tight, structure-based stop** beyond the spike wick, not a fixed percentage — headline volatility blows through normal ATR-based stops.
+7. **Time-box the trade** — headline edges decay fast; default to closing same-session/within 24h rather than holding for a full structural target, unless lens 2 confirms the move has become a genuine structural break.
+8. **Reduce size vs. a normal swing entry** — headline ranges are wider and less predictable than structure-based entries.
+
+Full expanded event table and more historical examples in `references/geopolitical-headline-playbook.md`.
+
+### 8. Astrological timing overlay — optional, sentiment-only, weight 0% on direction
 Explicit caveat: there is no demonstrated causal mechanism here. It is included because some traders in this space (Gann lineage, parts of the crypto-astro community, occasionally referenced by Mayne) watch it for **volatility clustering and crowd-psychology timing**, not price direction.
 
 - **Mercury retrograde windows**: anecdotally correlated with choppier price action and sharper reversals/exhaustion — in an existing bear trend these periods have coincided with sharp legs down, in a bull trend with sharp blow-off or shakeout moves. Use only as a "tighten stops, reduce size, expect chop" flag.
 - **Full moon / new moon**: some traders treat these as minor turning-point *timing* windows to cross-check against a PA-based reversal signal — never as a standalone trigger.
 - **Gann time-price cycles**: anniversary dates of major prior highs/lows are watched as candidate turning dates worth cross-referencing against structure.
-- **Hard rule**: astrology may only ever adjust position size or stop placement around a trade already justified by lenses 1–6. It must never be the sole reason to enter or exit.
+- **Hard rule**: astrology may only ever adjust position size or stop placement around a trade already justified by lenses 1–7. It must never be the sole reason to enter or exit.
 
 Expanded notes and sourcing caveats in `references/astro-timing.md`.
 
 ## Synthesis & output template
 
-Only take a trade where **at least two of the four primary pillars (PA, TA, cycle context, spot demand flow) agree**. Use derivatives data (funding/OI/put-call) to time the entry within that thesis. Use the macro/volatility calendar to decide *when* in the week to act (or to stand aside) — it can delay or accelerate an entry but doesn't flip the directional bias. Use the astro overlay only to size/tighten risk.
+Two modes, matching the timeframe-adaptation section above:
+
+- **Swing mode**: only take a trade where **at least two of the four primary pillars (PA, TA, cycle context, spot demand flow) agree**. Use derivatives data (funding/OI/put-call) to time the entry within that thesis. Use the macro calendar and any live geopolitical/headline read to decide *when* to act (or stand aside) — they can delay/accelerate an entry or shift the bias, but the primary pillars still decide direction. Use the astro overlay only to size/tighten risk.
+- **Scalp/headline mode**: when a live breaking-news event is the trigger, run lens 7's Headline Trade Protocol directly instead of waiting for full pillar agreement — check it against the existing structural bias for sizing/conviction, but don't require the 2-of-4 agreement rule to act.
 
 When asked to "read" the market, produce:
 
@@ -107,6 +150,7 @@ TA confirmation: [trend/momentum/volume state] — see lens 3
 Spot flow:       [Coinbase premium sign + ETF 5-day net flow + implication] — see lens 4
 Derivatives:     [funding/OI/put-call ratio read + implication] — see lens 5
 Macro calendar:  [any FOMC/CPI/PPI/NFP/witching/expiry inside the trade window — see lens 6, or "clear"]
+Headline flag:   [any live breaking event — category/tier + expected reaction — see lens 7, or "none active"]
 Astro flag:      [any active window — vol-up/reduce-size flag only, or "none active"]
 Key levels:      [invalidation level] / [target/next liquidity pool]
 Trigger:         [what needs to happen to act]
@@ -122,6 +166,7 @@ Position sizing: [risk % of account given stop distance]
 - Weight spot-flow signals (Coinbase premium, ETF net flows) above derivatives signals when they conflict — real capital moving is stronger evidence than leveraged positioning.
 - Historical 4-year-cycle bear phases have produced 70–85% peak-to-trough drawdowns — size and leverage choices should assume this can happen again, especially late in a markup phase that feels euphoric.
 - Don't open fresh directional risk inside the 24–48h pre-window of FOMC/CPI/PPI/NFP, and reduce leverage going into large monthly/quarterly crypto options & futures expiries — these are known volatility-injection points, not opportunities to add conviction.
+- Don't trade unconfirmed single-source headlines, don't chase the first 1–5 minutes of a breaking-news candle, and size headline trades smaller than structure-based swing entries — see lens 7's Headline Trade Protocol.
 - Futures/leverage trading can produce full loss of margin; treat leverage as a timing tool for a thesis you already believe, not a way to force a bigger edge out of a weak one.
 
 ## Reference files (load on demand)
@@ -131,6 +176,7 @@ Position sizing: [risk % of account given stop distance]
 - `references/spot-flow-indicators.md` — Coinbase Premium Index (formula + live endpoints) and spot BTC ETF net-flow data, with tested free/no-key sources.
 - `references/derivatives-timing.md` — funding rate, open interest, put/call ratio, and liquidation-heatmap mechanics with a fuller decision matrix.
 - `references/macro-calendar.md` — 2026 FOMC/CPI/PPI/NFP/witching/crypto-options-expiry dates and a weekly event-risk checklist.
+- `references/geopolitical-headline-playbook.md` — expanded event-category table, more historical examples, live news-feed setup, and the full Headline Trade Protocol.
 - `references/astro-timing.md` — expanded astrological timing concepts, sourcing, and caveats.
 
 ## Disclaimer
