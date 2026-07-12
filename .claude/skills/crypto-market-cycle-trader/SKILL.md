@@ -169,6 +169,16 @@ Position sizing: [risk % of account given stop distance]
 - Don't trade unconfirmed single-source headlines, don't chase the first 1–5 minutes of a breaking-news candle, and size headline trades smaller than structure-based swing entries — see lens 7's Headline Trade Protocol.
 - Futures/leverage trading can produce full loss of margin; treat leverage as a timing tool for a thesis you already believe, not a way to force a bigger edge out of a weak one.
 
+## Trade journal & funded-account tracking
+
+The user's trade journal lives at `trading/dashboard.html` in this repo — a self-contained page (data embedded in its `trade-data` JSON block, no backend) tracking progress toward the prop-eval profit target, equity curve, daily PnL, stats, and open positions, with CSV export for Excel. Workflow when the user posts a position screenshot or reports a fill:
+
+1. Read the screenshot/message and extract: pair, direction, style (scalp/swing/headline), entry, exit (if closing), size, fees, PnL, open/close timestamps.
+2. Edit the `trade-data` JSON block in `trading/dashboard.html` — append new trades, or move an open trade to `status: "closed"` with `exit`, `closed`, and `pnl` filled in. Never maintain a second copy of the data anywhere else; this block is the single source of truth.
+3. Include a one-line `notes` field capturing the setup and which lens triggered it — this builds the by-style stats that show which setups actually pay.
+4. Commit and push, then republish the artifact **to the same URL** (pass the existing artifact URL) so the user's wife's bookmarked link stays current.
+5. Config (`startingBalance`, `profitTarget`, `maxDrawdownPct`, `dailyLossLimitPct`) lives in the same JSON block; limits flagged `limitsAssumed: true` are placeholders the user still needs to confirm against their eval's real rules.
+
 ## Reference files (load on demand)
 
 - `references/trader-playbooks.md` — expanded methodology notes on Trader Mayne, TraderXO, and the other traders referenced above, with sources.

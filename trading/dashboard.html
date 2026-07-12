@@ -1,0 +1,652 @@
+<title>Road to Funded — Trading Journal</title>
+<style>
+  :root {
+    --page: #f9f9f7;
+    --surface: #fcfcfb;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --muted: #898781;
+    --grid: #e1e0d9;
+    --baseline: #c3c2b7;
+    --border: rgba(11, 11, 11, 0.10);
+    --accent: #2a78d6;
+    --accent-soft: #cde2fb;
+    --good: #0ca30c;
+    --good-text: #006300;
+    --critical: #d03b3b;
+    --warn: #fab219;
+    --tile: #fcfcfb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0d0d0d;
+      --surface: #1a1a19;
+      --ink: #ffffff;
+      --ink-2: #c3c2b7;
+      --muted: #898781;
+      --grid: #2c2c2a;
+      --baseline: #383835;
+      --border: rgba(255, 255, 255, 0.10);
+      --accent: #3987e5;
+      --accent-soft: #104281;
+      --good: #0ca30c;
+      --good-text: #0ca30c;
+      --critical: #d03b3b;
+      --warn: #fab219;
+      --tile: #1a1a19;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #0d0d0d;
+    --surface: #1a1a19;
+    --ink: #ffffff;
+    --ink-2: #c3c2b7;
+    --muted: #898781;
+    --grid: #2c2c2a;
+    --baseline: #383835;
+    --border: rgba(255, 255, 255, 0.10);
+    --accent: #3987e5;
+    --accent-soft: #104281;
+    --good: #0ca30c;
+    --good-text: #0ca30c;
+    --critical: #d03b3b;
+    --warn: #fab219;
+    --tile: #1a1a19;
+  }
+  :root[data-theme="light"] {
+    --page: #f9f9f7;
+    --surface: #fcfcfb;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --muted: #898781;
+    --grid: #e1e0d9;
+    --baseline: #c3c2b7;
+    --border: rgba(11, 11, 11, 0.10);
+    --accent: #2a78d6;
+    --accent-soft: #cde2fb;
+    --good: #0ca30c;
+    --good-text: #006300;
+    --critical: #d03b3b;
+    --warn: #fab219;
+    --tile: #fcfcfb;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--page);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.45;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 20px 16px 64px; }
+
+  .eyebrow {
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); font-weight: 600; margin: 0 0 2px;
+  }
+  h1 { font-size: 22px; margin: 0 0 2px; letter-spacing: -0.01em; }
+  .sub { color: var(--ink-2); font-size: 13px; margin: 0; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px; margin-top: 14px;
+  }
+
+  /* Hero — family view */
+  .hero-num {
+    font-size: 44px; font-weight: 700; letter-spacing: -0.02em;
+    margin: 8px 0 0; line-height: 1.1;
+  }
+  .hero-num small { font-size: 20px; font-weight: 600; color: var(--ink-2); }
+  .pos { color: var(--good-text); }
+  .neg { color: var(--critical); }
+  .progress-track {
+    height: 12px; border-radius: 6px; background: var(--grid);
+    margin: 14px 0 6px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 6px; background: var(--accent);
+    min-width: 2px; transition: width .4s ease;
+  }
+  @media (prefers-reduced-motion: reduce) { .progress-fill { transition: none; } }
+  .progress-labels {
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .plain {
+    font-size: 14px; color: var(--ink-2); margin: 12px 0 0;
+  }
+
+  /* Tiles */
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+  .tile {
+    background: var(--tile); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px;
+  }
+  .tile .label { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .tile .value { font-size: 20px; font-weight: 700; margin-top: 3px; font-variant-numeric: tabular-nums; }
+  .tile .hint { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .assumed { color: var(--warn); font-weight: 600; }
+
+  /* Sections */
+  h2 { font-size: 14px; margin: 0 0 10px; letter-spacing: 0.02em; }
+  .chart-wrap { position: relative; }
+  .chart-empty {
+    color: var(--muted); font-size: 13px; text-align: center; padding: 28px 8px;
+  }
+  svg text { font-family: inherit; }
+
+  .tooltip {
+    position: absolute; pointer-events: none; display: none;
+    background: var(--ink); color: var(--page);
+    font-size: 12px; padding: 6px 9px; border-radius: 6px;
+    white-space: nowrap; transform: translate(-50%, -130%);
+    font-variant-numeric: tabular-nums; z-index: 5;
+  }
+
+  /* Stats grid */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  @media (max-width: 480px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  .stat .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+  .stat .value { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  /* Open positions */
+  .open-pos {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 10px 0; border-bottom: 1px solid var(--grid); gap: 8px; flex-wrap: wrap;
+  }
+  .open-pos:last-child { border-bottom: none; }
+  .dir-pill {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .dir-short { background: color-mix(in srgb, var(--critical) 15%, transparent); color: var(--critical); }
+  .dir-long { background: color-mix(in srgb, var(--good) 15%, transparent); color: var(--good-text); }
+  .pos-meta { font-size: 12px; color: var(--ink-2); width: 100%; font-variant-numeric: tabular-nums; }
+
+  /* Table */
+  .table-scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 12.5px; min-width: 640px; }
+  th {
+    text-align: left; color: var(--muted); font-weight: 600; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--baseline); padding: 6px 10px 6px 0;
+  }
+  td { padding: 7px 10px 7px 0; border-bottom: 1px solid var(--grid); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.num, th.num { text-align: right; }
+  .table-empty { color: var(--muted); font-size: 13px; padding: 16px 0; }
+
+  .btn {
+    display: inline-block; background: var(--accent); color: #fff; border: none;
+    font: inherit; font-size: 13px; font-weight: 600;
+    padding: 8px 14px; border-radius: 8px; cursor: pointer;
+  }
+  .btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .footnote { font-size: 11.5px; color: var(--muted); margin-top: 16px; }
+  .footnote code { font-family: ui-monospace, monospace; font-size: 11px; }
+  .demo-banner {
+    background: color-mix(in srgb, var(--warn) 18%, transparent);
+    border: 1px solid color-mix(in srgb, var(--warn) 45%, transparent);
+    color: var(--ink); font-size: 12.5px; font-weight: 600;
+    border-radius: 8px; padding: 8px 12px; margin-top: 12px; display: none;
+  }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow" id="account-name">Prop · Intermediate Eval 1</p>
+  <h1>Road to Funded</h1>
+  <p class="sub" id="as-of"></p>
+  <div class="demo-banner" id="demo-banner">DEMO DATA — add <code>?demo</code> removed. This is sample data to preview the layout.</div>
+
+  <!-- Family view -->
+  <div class="card">
+    <p class="eyebrow">Profit toward funded target</p>
+    <p class="hero-num" id="hero-pnl">$0</p>
+    <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="progress-bar-outer">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+    <div class="progress-labels">
+      <span>$0</span>
+      <span id="progress-pct">0%</span>
+      <span id="progress-target">$12,000</span>
+    </div>
+    <p class="plain" id="plain-line"></p>
+  </div>
+
+  <!-- Guardrails -->
+  <div class="tiles">
+    <div class="tile">
+      <div class="label">Today</div>
+      <div class="value" id="tile-today">—</div>
+      <div class="hint" id="tile-today-hint"></div>
+    </div>
+    <div class="tile">
+      <div class="label">Equity</div>
+      <div class="value" id="tile-equity">—</div>
+      <div class="hint" id="tile-equity-hint"></div>
+    </div>
+    <div class="tile">
+      <div class="label">Daily-loss headroom</div>
+      <div class="value" id="tile-daily">—</div>
+      <div class="hint"><span class="assumed" id="daily-assumed"></span> <span id="tile-daily-hint"></span></div>
+    </div>
+    <div class="tile">
+      <div class="label">Drawdown headroom</div>
+      <div class="value" id="tile-dd">—</div>
+      <div class="hint"><span class="assumed" id="dd-assumed"></span> <span id="tile-dd-hint"></span></div>
+    </div>
+  </div>
+
+  <!-- Equity curve -->
+  <div class="card">
+    <h2>Equity curve</h2>
+    <div class="chart-wrap" id="equity-chart-wrap">
+      <div class="tooltip" id="equity-tooltip"></div>
+    </div>
+  </div>
+
+  <!-- Daily PnL -->
+  <div class="card">
+    <h2>Daily P&amp;L</h2>
+    <div class="chart-wrap" id="daily-chart-wrap">
+      <div class="tooltip" id="daily-tooltip"></div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="card">
+    <h2>Stats (closed trades)</h2>
+    <div class="stats" id="stats-grid"></div>
+  </div>
+
+  <!-- Open positions -->
+  <div class="card">
+    <h2>Open positions</h2>
+    <div id="open-positions"></div>
+  </div>
+
+  <!-- Trade log -->
+  <div class="card">
+    <h2>Trade log</h2>
+    <div class="table-scroll">
+      <table id="trades-table" aria-label="All trades">
+        <thead>
+          <tr>
+            <th>Closed</th><th>Pair</th><th>Dir</th><th>Style</th>
+            <th class="num">Entry</th><th class="num">Exit</th>
+            <th class="num">Size</th><th class="num">Fees</th><th class="num">P&amp;L</th>
+          </tr>
+        </thead>
+        <tbody id="trades-tbody"></tbody>
+      </table>
+    </div>
+    <div class="table-empty" id="table-empty" style="display:none">No closed trades yet — the log fills in as trades close.</div>
+    <p style="margin:14px 0 0"><button class="btn" id="export-csv" type="button">Export CSV (Excel)</button></p>
+  </div>
+
+  <p class="footnote">
+    Data lives in the <code>trade-data</code> JSON block inside this file — single source of truth.
+    Limits marked <span class="assumed">assumed</span> are placeholders: edit <code>maxDrawdownPct</code> /
+    <code>dailyLossLimitPct</code> in the data block to match your eval's real rules.
+    Unrealized P&amp;L on open positions is not included in any figure. Add <code>?demo</code> to the URL to preview with sample data.
+  </p>
+</div>
+
+<script type="application/json" id="trade-data">
+{
+  "config": {
+    "accountName": "Prop · Intermediate Eval 1",
+    "startingBalance": 100000,
+    "profitTarget": 12000,
+    "maxDrawdownPct": 6,
+    "dailyLossLimitPct": 3,
+    "limitsAssumed": true
+  },
+  "trades": [
+    {
+      "id": 1,
+      "status": "open",
+      "opened": "2026-07-12T19:15",
+      "closed": null,
+      "pair": "BTC/USD",
+      "dir": "short",
+      "style": "swing",
+      "entry": 64119,
+      "exit": null,
+      "size": 1.395,
+      "fees": 35.78,
+      "pnl": null,
+      "notes": "Tactical swing short. Iran escalation tailwind. TP1 63.5k (1/3), TP2 62.2k, stretch 58.3k on daily close < 62k. Invalidation: daily close > 65.8-66k."
+    }
+  ]
+}
+</script>
+
+<script>
+(function () {
+  "use strict";
+
+  var raw = JSON.parse(document.getElementById("trade-data").textContent);
+  var config = raw.config;
+  var isDemo = /[?&]demo/.test(location.search);
+
+  var trades = raw.trades.slice();
+  if (isDemo) {
+    document.getElementById("demo-banner").style.display = "block";
+    document.getElementById("demo-banner").textContent = "DEMO DATA — sample trades for layout preview. Remove ?demo from the URL for your real journal.";
+    trades = demoTrades();
+  }
+
+  var closed = trades.filter(function (t) { return t.status === "closed"; })
+    .sort(function (a, b) { return a.closed < b.closed ? -1 : 1; });
+  var open = trades.filter(function (t) { return t.status === "open"; });
+
+  // ---------- helpers ----------
+  function fmtUsd(v, opts) {
+    opts = opts || {};
+    var sign = v < 0 ? "-" : (opts.plus && v > 0 ? "+" : "");
+    var abs = Math.abs(v);
+    var s = abs >= 1000
+      ? abs.toLocaleString("en-US", { maximumFractionDigits: 0 })
+      : abs.toLocaleString("en-US", { maximumFractionDigits: 2 });
+    return sign + "$" + s;
+  }
+  function dayKey(iso) { return iso ? iso.slice(0, 10) : null; }
+  function todayKey() {
+    var d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+  function el(id) { return document.getElementById(id); }
+  function pnlClass(v) { return v >= 0 ? "pos" : "neg"; }
+
+  // ---------- core numbers ----------
+  var realized = closed.reduce(function (s, t) { return s + t.pnl; }, 0);
+  var equity = config.startingBalance + realized;
+  var target = config.profitTarget;
+  var progressPct = Math.max(0, Math.min(100, (realized / target) * 100));
+
+  // peak equity for drawdown
+  var runningEq = config.startingBalance, peakEq = config.startingBalance;
+  closed.forEach(function (t) {
+    runningEq += t.pnl;
+    if (runningEq > peakEq) peakEq = runningEq;
+  });
+  var currentDD = peakEq - equity;
+  var maxDDAllowed = config.startingBalance * (config.maxDrawdownPct / 100);
+  var ddHeadroom = maxDDAllowed - currentDD;
+
+  var tKey = todayKey();
+  var todayPnl = closed.reduce(function (s, t) { return s + (dayKey(t.closed) === tKey ? t.pnl : 0); }, 0);
+  var dailyLossAllowed = config.startingBalance * (config.dailyLossLimitPct / 100);
+  var dailyHeadroom = dailyLossAllowed + Math.min(0, todayPnl);
+
+  // ---------- family view ----------
+  el("account-name").textContent = config.accountName;
+  el("as-of").textContent = "Updated " + new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+
+  var hero = el("hero-pnl");
+  hero.textContent = fmtUsd(realized, { plus: true });
+  hero.className = "hero-num " + pnlClass(realized);
+  el("progress-fill").style.width = progressPct + "%";
+  el("progress-fill").style.background = realized < 0 ? "var(--critical)" : "var(--accent)";
+  el("progress-pct").textContent = Math.round(progressPct) + "%";
+  el("progress-target").textContent = fmtUsd(target);
+  el("progress-bar-outer").setAttribute("aria-valuenow", Math.round(progressPct));
+
+  var remaining = target - realized;
+  el("plain-line").textContent = remaining > 0
+    ? fmtUsd(remaining) + " to go until the account is funded" + (open.length ? " · " + open.length + " position open" : "")
+    : "Target hit — funded! 🎉";
+
+  // ---------- tiles ----------
+  var tToday = el("tile-today");
+  tToday.textContent = fmtUsd(todayPnl, { plus: true });
+  tToday.className = "value " + pnlClass(todayPnl);
+  el("tile-today-hint").textContent = closed.filter(function (t) { return dayKey(t.closed) === tKey; }).length + " closed today";
+
+  el("tile-equity").textContent = fmtUsd(equity);
+  el("tile-equity-hint").textContent = "start " + fmtUsd(config.startingBalance);
+
+  var tDaily = el("tile-daily");
+  tDaily.textContent = fmtUsd(Math.max(0, dailyHeadroom));
+  tDaily.className = "value " + (dailyHeadroom < dailyLossAllowed * 0.34 ? "neg" : "");
+  el("tile-daily-hint").textContent = "of " + fmtUsd(dailyLossAllowed) + " daily-loss limit";
+  el("daily-assumed").textContent = config.limitsAssumed ? "assumed · " : "";
+
+  var tDD = el("tile-dd");
+  tDD.textContent = fmtUsd(Math.max(0, ddHeadroom));
+  tDD.className = "value " + (ddHeadroom < maxDDAllowed * 0.34 ? "neg" : "");
+  el("tile-dd-hint").textContent = "of " + fmtUsd(maxDDAllowed) + " max drawdown";
+  el("dd-assumed").textContent = config.limitsAssumed ? "assumed · " : "";
+
+  // ---------- equity curve ----------
+  (function drawEquity() {
+    var wrap = el("equity-chart-wrap");
+    if (closed.length === 0) {
+      wrap.insertAdjacentHTML("beforeend", '<div class="chart-empty">The curve starts after your first closed trade.</div>');
+      return;
+    }
+    var pts = [{ label: "Start", eq: config.startingBalance }];
+    var run = config.startingBalance;
+    closed.forEach(function (t) {
+      run += t.pnl;
+      pts.push({ label: dayKey(t.closed) + " · " + t.pair + " " + t.dir, eq: run, pnl: t.pnl });
+    });
+
+    var W = 660, H = 200, padL = 52, padR = 10, padT = 10, padB = 22;
+    var lo = Math.min.apply(null, pts.map(function (p) { return p.eq; }));
+    var hi = Math.max.apply(null, pts.map(function (p) { return p.eq; }));
+    var span = Math.max(hi - lo, 1) * 1.15;
+    var mid = (hi + lo) / 2;
+    lo = mid - span / 2; hi = mid + span / 2;
+
+    function x(i) { return padL + (i / (pts.length - 1)) * (W - padL - padR); }
+    function y(v) { return padT + (1 - (v - lo) / (hi - lo)) * (H - padT - padB); }
+
+    var line = pts.map(function (p, i) { return (i ? "L" : "M") + x(i).toFixed(1) + " " + y(p.eq).toFixed(1); }).join(" ");
+    var area = line + " L" + x(pts.length - 1).toFixed(1) + " " + (H - padB) + " L" + padL + " " + (H - padB) + " Z";
+
+    var gridLines = "", labels = "";
+    for (var g = 0; g <= 3; g++) {
+      var gv = lo + ((hi - lo) * g) / 3;
+      var gy = y(gv);
+      gridLines += '<line x1="' + padL + '" x2="' + (W - padR) + '" y1="' + gy.toFixed(1) + '" y2="' + gy.toFixed(1) + '" stroke="var(--grid)" stroke-width="1"/>';
+      labels += '<text x="' + (padL - 6) + '" y="' + (gy + 4).toFixed(1) + '" text-anchor="end" font-size="10" fill="var(--muted)">' + Math.round(gv / 1000) + "k</text>";
+    }
+    var endP = pts[pts.length - 1];
+
+    var svg =
+      '<svg viewBox="0 0 ' + W + " " + H + '" width="100%" role="img" aria-label="Equity curve">' +
+      gridLines + labels +
+      '<path d="' + area + '" fill="var(--accent-soft)" opacity="0.35"/>' +
+      '<path d="' + line + '" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>' +
+      '<circle cx="' + x(pts.length - 1).toFixed(1) + '" cy="' + y(endP.eq).toFixed(1) + '" r="4" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/>' +
+      '<line id="eq-cross" x1="0" x2="0" y1="' + padT + '" y2="' + (H - padB) + '" stroke="var(--baseline)" stroke-width="1" opacity="0"/>' +
+      "</svg>";
+    wrap.insertAdjacentHTML("beforeend", svg);
+
+    var svgEl = wrap.querySelector("svg"), tip = el("equity-tooltip"), cross = wrap.querySelector("#eq-cross");
+    svgEl.addEventListener("mousemove", function (ev) {
+      var r = svgEl.getBoundingClientRect();
+      var mx = ((ev.clientX - r.left) / r.width) * W;
+      var i = Math.round(((mx - padL) / (W - padL - padR)) * (pts.length - 1));
+      i = Math.max(0, Math.min(pts.length - 1, i));
+      var p = pts[i];
+      cross.setAttribute("x1", x(i)); cross.setAttribute("x2", x(i)); cross.setAttribute("opacity", "1");
+      tip.style.display = "block";
+      tip.style.left = (x(i) / W) * r.width + "px";
+      tip.style.top = (y(p.eq) / H) * r.height + "px";
+      tip.textContent = p.label + " · " + fmtUsd(p.eq);
+    });
+    svgEl.addEventListener("mouseleave", function () {
+      tip.style.display = "none"; cross.setAttribute("opacity", "0");
+    });
+  })();
+
+  // ---------- daily pnl bars ----------
+  (function drawDaily() {
+    var wrap = el("daily-chart-wrap");
+    if (closed.length === 0) {
+      wrap.insertAdjacentHTML("beforeend", '<div class="chart-empty">Daily P&amp;L appears once trades close.</div>');
+      return;
+    }
+    var byDay = {};
+    closed.forEach(function (t) {
+      var k = dayKey(t.closed);
+      byDay[k] = (byDay[k] || 0) + t.pnl;
+    });
+    var days = Object.keys(byDay).sort();
+    var W = 660, H = 170, padL = 52, padR = 10, padT = 10, padB = 24;
+    var maxAbs = Math.max.apply(null, days.map(function (d) { return Math.abs(byDay[d]); })) * 1.15;
+    var zeroY = padT + (H - padT - padB) / 2;
+    function y(v) { return zeroY - (v / maxAbs) * ((H - padT - padB) / 2); }
+    var innerW = W - padL - padR;
+    var slot = innerW / days.length;
+    var barW = Math.min(26, Math.max(6, slot - 4));
+
+    var bars = "", dayLabels = "";
+    days.forEach(function (d, i) {
+      var v = byDay[d];
+      var bx = padL + slot * i + (slot - barW) / 2;
+      var by = Math.min(y(v), zeroY), bh = Math.max(Math.abs(y(v) - zeroY), 1);
+      bars += '<rect data-day="' + d + '" data-v="' + v + '" x="' + bx.toFixed(1) + '" y="' + by.toFixed(1) +
+        '" width="' + barW.toFixed(1) + '" height="' + bh.toFixed(1) + '" rx="3" fill="' +
+        (v >= 0 ? "var(--good)" : "var(--critical)") + '"/>';
+      if (days.length <= 14 || i % Math.ceil(days.length / 10) === 0) {
+        dayLabels += '<text x="' + (bx + barW / 2).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle" font-size="9" fill="var(--muted)">' + d.slice(5) + "</text>";
+      }
+    });
+
+    var svg =
+      '<svg viewBox="0 0 ' + W + " " + H + '" width="100%" role="img" aria-label="Daily profit and loss">' +
+      '<line x1="' + padL + '" x2="' + (W - padR) + '" y1="' + zeroY + '" y2="' + zeroY + '" stroke="var(--baseline)" stroke-width="1"/>' +
+      '<text x="' + (padL - 6) + '" y="' + (zeroY + 4) + '" text-anchor="end" font-size="10" fill="var(--muted)">0</text>' +
+      bars + dayLabels + "</svg>";
+    wrap.insertAdjacentHTML("beforeend", svg);
+
+    var tip = el("daily-tooltip"), svgEl = wrap.querySelector("svg");
+    svgEl.addEventListener("mousemove", function (ev) {
+      var t = ev.target;
+      if (t.tagName === "rect") {
+        var r = svgEl.getBoundingClientRect();
+        var br = t.getBoundingClientRect();
+        tip.style.display = "block";
+        tip.style.left = (br.left - r.left + br.width / 2) + "px";
+        tip.style.top = (br.top - r.top) + "px";
+        tip.textContent = t.getAttribute("data-day") + " · " + fmtUsd(+t.getAttribute("data-v"), { plus: true });
+      } else { tip.style.display = "none"; }
+    });
+    svgEl.addEventListener("mouseleave", function () { tip.style.display = "none"; });
+  })();
+
+  // ---------- stats ----------
+  (function stats() {
+    var g = el("stats-grid");
+    if (closed.length === 0) {
+      g.innerHTML = '<div class="stat" style="grid-column:1/-1"><div class="label">No closed trades yet</div><div class="value" style="font-size:13px;font-weight:400;color:var(--muted)">Stats build as the log grows.</div></div>';
+      return;
+    }
+    var wins = closed.filter(function (t) { return t.pnl > 0; });
+    var losses = closed.filter(function (t) { return t.pnl <= 0; });
+    var grossW = wins.reduce(function (s, t) { return s + t.pnl; }, 0);
+    var grossL = Math.abs(losses.reduce(function (s, t) { return s + t.pnl; }, 0));
+    var pf = grossL === 0 ? "∞" : (grossW / grossL).toFixed(2);
+    var avgW = wins.length ? grossW / wins.length : 0;
+    var avgL = losses.length ? -grossL / losses.length : 0;
+    var expectancy = realized / closed.length;
+
+    var byStyle = {};
+    closed.forEach(function (t) {
+      byStyle[t.style] = byStyle[t.style] || { n: 0, pnl: 0 };
+      byStyle[t.style].n++; byStyle[t.style].pnl += t.pnl;
+    });
+    var styleLine = Object.keys(byStyle).map(function (k) {
+      return k + " " + byStyle[k].n + " (" + fmtUsd(byStyle[k].pnl, { plus: true }) + ")";
+    }).join(" · ");
+
+    function stat(label, value, cls) {
+      return '<div class="stat"><div class="label">' + label + '</div><div class="value ' + (cls || "") + '">' + value + "</div></div>";
+    }
+    g.innerHTML =
+      stat("Trades", closed.length) +
+      stat("Win rate", Math.round((wins.length / closed.length) * 100) + "%") +
+      stat("Profit factor", pf) +
+      stat("Avg win", fmtUsd(avgW), "pos") +
+      stat("Avg loss", fmtUsd(avgL), "neg") +
+      stat("Expectancy / trade", fmtUsd(expectancy, { plus: true }), pnlClass(expectancy)) +
+      '<div class="stat" style="grid-column:1/-1"><div class="label">By style</div><div class="value" style="font-size:13px;font-weight:600">' + styleLine + "</div></div>";
+  })();
+
+  // ---------- open positions ----------
+  (function openPositions() {
+    var wrap = el("open-positions");
+    if (open.length === 0) {
+      wrap.innerHTML = '<div class="table-empty">Flat — no open positions.</div>';
+      return;
+    }
+    wrap.innerHTML = open.map(function (t) {
+      return '<div class="open-pos">' +
+        '<span><span class="dir-pill dir-' + t.dir + '">' + t.dir + "</span> <strong>" + t.pair + "</strong> · " + t.size + " BTC @ " + fmtUsd(t.entry) + "</span>" +
+        '<span style="font-size:12px;color:var(--muted)">' + t.style + " · opened " + t.opened.replace("T", " ") + "</span>" +
+        (t.notes ? '<span class="pos-meta">' + t.notes + "</span>" : "") +
+        "</div>";
+    }).join("");
+  })();
+
+  // ---------- trade table ----------
+  (function table() {
+    var tbody = el("trades-tbody");
+    if (closed.length === 0) {
+      el("trades-table").style.display = "none";
+      el("table-empty").style.display = "block";
+      return;
+    }
+    tbody.innerHTML = closed.slice().reverse().map(function (t) {
+      return "<tr>" +
+        "<td>" + dayKey(t.closed) + "</td>" +
+        "<td>" + t.pair + "</td>" +
+        "<td>" + t.dir + "</td>" +
+        "<td>" + t.style + "</td>" +
+        '<td class="num">' + fmtUsd(t.entry) + "</td>" +
+        '<td class="num">' + fmtUsd(t.exit) + "</td>" +
+        '<td class="num">' + t.size + "</td>" +
+        '<td class="num">' + fmtUsd(t.fees) + "</td>" +
+        '<td class="num ' + pnlClass(t.pnl) + '"><strong>' + fmtUsd(t.pnl, { plus: true }) + "</strong></td>" +
+        "</tr>";
+    }).join("");
+  })();
+
+  // ---------- csv export ----------
+  el("export-csv").addEventListener("click", function () {
+    var head = ["id", "status", "opened", "closed", "pair", "dir", "style", "entry", "exit", "size", "fees", "pnl", "notes"];
+    var rows = trades.map(function (t) {
+      return head.map(function (k) {
+        var v = t[k] == null ? "" : String(t[k]);
+        return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+      }).join(",");
+    });
+    var csv = head.join(",") + "\n" + rows.join("\n");
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    a.download = "trades.csv";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  // ---------- demo data ----------
+  function demoTrades() {
+    return [
+      { id: 1, status: "closed", opened: "2026-07-01T09:10", closed: "2026-07-01T14:40", pair: "BTC/USD", dir: "long", style: "scalp", entry: 58200, exit: 59450, size: 0.8, fees: 24, pnl: 976, notes: "Sweep of 57950 low, reclaim entry" },
+      { id: 2, status: "closed", opened: "2026-07-02T11:00", closed: "2026-07-03T16:20", pair: "BTC/USD", dir: "long", style: "swing", entry: 59100, exit: 61800, size: 1.0, fees: 30, pnl: 2670, notes: "Continuation off spring" },
+      { id: 3, status: "closed", opened: "2026-07-05T20:15", closed: "2026-07-05T22:05", pair: "BTC/USD", dir: "short", style: "headline", entry: 62900, exit: 63400, size: 1.2, fees: 38, pnl: -638, notes: "Faded tariff rumor, stopped — Tier 3 headline, mistake" },
+      { id: 4, status: "closed", opened: "2026-07-07T08:30", closed: "2026-07-08T19:00", pair: "BTC/USD", dir: "long", style: "swing", entry: 62400, exit: 64100, size: 1.1, fees: 34, pnl: 1836, notes: "" },
+      { id: 5, status: "closed", opened: "2026-07-09T13:45", closed: "2026-07-09T15:10", pair: "BTC/USD", dir: "short", style: "scalp", entry: 64500, exit: 64050, size: 1.4, fees: 36, pnl: 594, notes: "R1 rejection" },
+      { id: 6, status: "closed", opened: "2026-07-10T10:00", closed: "2026-07-10T11:30", pair: "BTC/USD", dir: "long", style: "scalp", entry: 63700, exit: 63450, size: 1.3, fees: 33, pnl: -358, notes: "Chop, cut fast" },
+      { id: 7, status: "open", opened: "2026-07-12T19:15", closed: null, pair: "BTC/USD", dir: "short", style: "swing", entry: 64119, exit: null, size: 1.395, fees: 35.78, pnl: null, notes: "Tactical swing short. TP1 63.5k, TP2 62.2k, inval 66k." }
+    ];
+  }
+})();
+</script>
