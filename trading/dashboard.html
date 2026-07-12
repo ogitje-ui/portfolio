@@ -211,6 +211,13 @@
   .grade-CONFIRMED { background: color-mix(in srgb, var(--good) 14%, transparent); color: var(--good-text); }
   .grade-MIXED { background: color-mix(in srgb, var(--warn) 20%, transparent); color: var(--ink); }
   .grade-AGAINST { background: color-mix(in srgb, var(--critical) 14%, transparent); color: var(--critical); }
+  .dir-watch { background: color-mix(in srgb, var(--muted) 18%, transparent); color: var(--ink-2); }
+  .brief { padding: 12px 0; border-bottom: 1px solid var(--grid); }
+  .brief:last-child { border-bottom: none; }
+  .brief-head { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  .brief-verdict { font-weight: 700; font-size: 14px; margin: 3px 0 6px; }
+  .brief-level { font-size: 13px; padding: 2px 0; font-variant-numeric: tabular-nums; }
+  .brief-notes { font-size: 12px; color: var(--ink-2); margin-top: 5px; }
 </style>
 
 <div class="wrap">
@@ -264,6 +271,12 @@
       <div class="value" id="tile-sizing" style="font-size:15px"></div>
       <div class="hint" id="tile-sizing-hint"></div>
     </div>
+  </div>
+
+  <!-- Briefings -->
+  <div class="card">
+    <h2>Briefings (08:45 &amp; 15:10 CEST)</h2>
+    <div id="briefings-list"></div>
   </div>
 
   <!-- Equity curve -->
@@ -331,6 +344,19 @@
     "dailyLossLimitPct": 3,
     "limitsAssumed": false
   },
+  "briefings": [
+    {
+      "ts": "2026-07-12T22:00",
+      "type": "test run",
+      "verdict": "STAND ASIDE — mid-range, CPI Tuesday 14:30 CEST, cross-assets not confirming Hormuz escalation",
+      "levels": [
+        { "px": "65,600-65,800", "side": "short", "label": "short zone (resistance cluster)" },
+        { "px": "63,445", "side": "watch", "label": "breakdown watch (daily pivot)" },
+        { "px": "62,000-62,200", "side": "long", "label": "sweep-reclaim long zone" }
+      ],
+      "notes": "No sized setup: no confirmed break of levels, oil/VIX/ES not confirming escalation. Bracket a no-trade window around Tuesday's CPI print."
+    }
+  ],
   "trades": [
     {
       "id": 1,
@@ -524,6 +550,28 @@
       navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(false); });
     } else { done(false); }
   });
+
+  // ---------- briefings ----------
+  (function briefings() {
+    var wrap = el("briefings-list");
+    var items = (raw.briefings || []).slice(0, 3);
+    if (items.length === 0) {
+      wrap.innerHTML = '<div class="table-empty">No briefings archived yet — they land by email at 08:45 and 15:10 CEST and are stored here.</div>';
+      return;
+    }
+    wrap.innerHTML = items.map(function (b) {
+      var levels = (b.levels || []).map(function (l) {
+        var side = /^(long|short)$/.test(l.side) ? l.side : "watch";
+        return '<div class="brief-level"><span class="dir-pill dir-' + side + '">' + side.toUpperCase() + "</span> " + l.px + " — " + l.label + "</div>";
+      }).join("");
+      return '<div class="brief">' +
+        '<div class="brief-head">' + b.ts.replace("T", " · ") + " · " + b.type + "</div>" +
+        '<div class="brief-verdict">' + b.verdict + "</div>" +
+        levels +
+        (b.notes ? '<div class="brief-notes">' + b.notes + "</div>" : "") +
+        "</div>";
+    }).join("");
+  })();
 
   // ---------- equity curve ----------
   (function drawEquity() {
