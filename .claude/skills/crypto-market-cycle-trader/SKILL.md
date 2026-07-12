@@ -52,6 +52,8 @@ This lens tracks *real* capital, not leverage — that's why it's weighted above
 - **Spot BTC ETF net flows** (IBIT, FBTC, ARKB, BITB, GBTC, and the rest of the US spot-ETF complex): multi-day sustained **net inflows** are one of the strongest available confirmations of a real markup phase; sustained **net outflows** (especially broad-based, not just one fund rotating into another) are a strong markdown/distribution confirmation. A single day is noisy — read it as a **5-day rolling net flow**, the same discipline used for the put/call ratio in lens 6.
 - **Combine the two**: positive Coinbase premium + positive ETF net flows in the same window = high-conviction confirmation of real spot demand behind a move (not just short-covering or leveraged momentum). Both negative at once = real distribution, treat any bounce as suspect until they turn.
 
+**Slow-moving backdrop feeds** (weekly relevance, endpoints in `references/live-data-quickref.md`): total stablecoin supply (growing = dry powder entering, shrinking = capital leaving), BTC dominance (rising in a downtrend = alts bleeding worse), and ETH/BTC (crypto-internal risk appetite).
+
 Full live-data endpoints, the DIY Coinbase-premium formula, and a fuller flow-reading walkthrough in `references/spot-flow-indicators.md`.
 
 ### 5. Futures & options positioning (entry timing) — weight ~10%
@@ -74,6 +76,8 @@ Use this to time entries *within* a thesis already built from lenses 1–4, not 
 | > ~1.2 (crypto extreme) / > 1.23 (CBOE extreme) | Heavy put buying | Capitulation-style extreme — classic contrarian bounce zone |
 
 Use the **5–10 day moving average** of the ratio, not a single reading — daily put/call prints are noisy and a one-day spike (e.g. a single large hedge trade) is not a sentiment shift. Treat this as a fear/greed cross-check on top of funding/OI, most useful for confirming (or fading) an already-extreme funding/OI reading rather than as a standalone trigger.
+
+**Additional positioning/sentiment feeds** (all free/no-key, endpoints + interpretation in `references/live-data-quickref.md`): open interest trend (OKX), retail long/short account ratio (contrarian at extremes, trend matters), taker buy/sell volume (aggression/absorption divergences), DVOL implied-vol index (low = complacency before expansion, spike = stress priced), CME basis (institutional demand gauge: healthy contango vs defensive backwardation), and the Fear & Greed Index (<20 contrarian bounce zone, >80 trim zone).
 
 Full detail and a walk-through in `references/derivatives-timing.md`.
 
@@ -267,6 +271,7 @@ The user's trade journal lives at `trading/dashboard.html` in this repo — a se
 - `references/macro-calendar.md` — 2026 FOMC/CPI/PPI/NFP/witching/crypto-options-expiry dates and a weekly event-risk checklist.
 - `references/geopolitical-headline-playbook.md` — expanded event-category table, more historical examples, live news-feed setup, and the full Headline Trade Protocol.
 - `references/cross-asset-signals.md` — DXY/gold/oil/silver/yields/VIX/ES regime reading, the oil-as-headline-verifier method, and tested live endpoints.
+- `references/live-data-quickref.md` — every tested free endpoint on one page (price, flows, funding/OI/long-short/taker/DVOL/put-call/CME basis, Fear & Greed, stablecoins, dominance, cross-asset, news) with the composite reading order.
 - `references/astro-timing.md` — expanded astrological timing concepts, sourcing, and caveats.
 
 ## Disclaimer
