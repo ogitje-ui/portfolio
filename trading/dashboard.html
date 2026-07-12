@@ -169,7 +169,7 @@
 
   /* Table */
   .table-scroll { overflow-x: auto; }
-  table { border-collapse: collapse; width: 100%; font-size: 12.5px; min-width: 640px; }
+  table { border-collapse: collapse; width: 100%; font-size: 12.5px; min-width: 780px; }
   th {
     text-align: left; color: var(--muted); font-weight: 600; font-size: 11px;
     text-transform: uppercase; letter-spacing: 0.05em;
@@ -193,6 +193,24 @@
     color: var(--ink); font-size: 12.5px; font-weight: 600;
     border-radius: 8px; padding: 8px 12px; margin-top: 12px; display: none;
   }
+  .day-state {
+    font-size: 13px; font-weight: 700; border-radius: 8px;
+    padding: 10px 12px; margin-top: 12px; display: none;
+  }
+  .day-ok { background: color-mix(in srgb, var(--good) 12%, transparent); color: var(--good-text); }
+  .day-caution { background: color-mix(in srgb, var(--warn) 18%, transparent); color: var(--ink); }
+  .day-stop { background: color-mix(in srgb, var(--critical) 15%, transparent); color: var(--critical); }
+  .btn-ghost {
+    background: transparent; color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+  .grade-chip {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 1px 6px; border-radius: 999px; letter-spacing: 0.03em;
+  }
+  .grade-CONFIRMED { background: color-mix(in srgb, var(--good) 14%, transparent); color: var(--good-text); }
+  .grade-MIXED { background: color-mix(in srgb, var(--warn) 20%, transparent); color: var(--ink); }
+  .grade-AGAINST { background: color-mix(in srgb, var(--critical) 14%, transparent); color: var(--critical); }
 </style>
 
 <div class="wrap">
@@ -200,6 +218,7 @@
   <h1>Road to Funded</h1>
   <p class="sub" id="as-of"></p>
   <div class="demo-banner" id="demo-banner">DEMO DATA — add <code>?demo</code> removed. This is sample data to preview the layout.</div>
+  <div class="day-state" id="day-state" role="status"></div>
 
   <!-- Family view -->
   <div class="card">
@@ -214,6 +233,8 @@
       <span id="progress-target">$12,000</span>
     </div>
     <p class="plain" id="plain-line"></p>
+    <p class="plain" id="pace-line" style="margin-top:4px"></p>
+    <p style="margin:12px 0 0"><button class="btn btn-ghost" id="copy-summary" type="button">Copy update for wife</button></p>
   </div>
 
   <!-- Guardrails -->
@@ -275,9 +296,9 @@
       <table id="trades-table" aria-label="All trades">
         <thead>
           <tr>
-            <th>Closed</th><th>Pair</th><th>Dir</th><th>Style</th>
+            <th>Closed</th><th>Pair</th><th>Dir</th><th>Style</th><th>Grade</th>
             <th class="num">Entry</th><th class="num">Exit</th>
-            <th class="num">Size</th><th class="num">Fees</th><th class="num">P&amp;L</th>
+            <th class="num">Size</th><th class="num">R</th><th class="num">Fees</th><th class="num">P&amp;L</th>
           </tr>
         </thead>
         <tbody id="trades-tbody"></tbody>
@@ -319,6 +340,10 @@
       "size": 1.395,
       "fees": 71.56,
       "pnl": -232.36,
+      "risk": 978,
+      "grade": "AGAINST",
+      "sl": 64820,
+      "tp": 63100,
       "notes": "Iran-headline short from mid-range chop zone. Conviction check graded it AGAINST at entry (1/4 pillars; oil/VIX/ES never confirmed the escalation). Scratched at market near breakeven once the premise died, well before the 64,820 stop. Process lesson: wait for range edges (65.6-65.8k rejection or sub-63,445 breakdown-retest), don't trade the feeling. PnL is net of fees."
     }
   ]
@@ -417,6 +442,71 @@
   el("tile-dd-hint").textContent = "floor " + fmtUsd(ddFloor) + " · " + fmtUsd(maxDDAllowed) + " max";
   el("dd-assumed").textContent = config.limitsAssumed ? "assumed · " : "";
 
+  // ---------- discipline banner ----------
+  (function dayState() {
+    var banner = el("day-state");
+    var todayTrades = closed.filter(function (t) { return dayKey(t.closed) === tKey; });
+    var lossStreak = 0;
+    for (var i = todayTrades.length - 1; i >= 0; i--) {
+      if (todayTrades[i].pnl < 0) lossStreak++; else break;
+    }
+    var msg = "", cls = "";
+    if (todayPnl <= -dailyLossAllowed) {
+      cls = "day-stop"; msg = "STOP — daily loss limit hit. Done for today; the eval survives to trade tomorrow.";
+    } else if (todayPnl <= -dailyLossAllowed * 0.5) {
+      cls = "day-caution"; msg = "CAUTION — over half the daily budget is gone (" + fmtUsd(todayPnl) + "). Reduce size or stop.";
+    } else if (lossStreak >= 3) {
+      cls = "day-caution"; msg = "TILT CHECK — " + lossStreak + " losses in a row today. Step away before the next entry.";
+    } else if (todayTrades.length > 0) {
+      cls = "day-ok"; msg = "Trading OK — today " + fmtUsd(todayPnl, { plus: true }) + " across " + todayTrades.length + " trade" + (todayTrades.length > 1 ? "s" : "") + ".";
+    }
+    if (msg) { banner.textContent = msg; banner.className = "day-state " + cls; banner.style.display = "block"; }
+  })();
+
+  // ---------- pace projection ----------
+  (function pace() {
+    var line = el("pace-line");
+    if (closed.length === 0) { line.textContent = ""; return; }
+    if (closed.length < 5) {
+      line.textContent = "Pace estimate unlocks at 5 closed trades (" + closed.length + "/5).";
+      return;
+    }
+    var exp = realized / closed.length;
+    if (exp <= 0) {
+      line.textContent = "Expectancy is negative right now — pace to target not computable. Fix process before size.";
+      return;
+    }
+    var tradesLeft = Math.ceil((target - realized) / exp);
+    var firstDay = new Date(closed[0].closed), lastDay = new Date(closed[closed.length - 1].closed);
+    var days = Math.max(1, (lastDay - firstDay) / 86400000);
+    var perDay = closed.length / days;
+    var daysLeft = Math.ceil(tradesLeft / perDay);
+    line.textContent = "At current expectancy (" + fmtUsd(exp, { plus: true }) + "/trade): ~" + tradesLeft + " trades / ~" + daysLeft + " trading days to target.";
+  })();
+
+  // ---------- copy summary for wife ----------
+  el("copy-summary").addEventListener("click", function () {
+    var weekAgo = Date.now() - 7 * 86400000;
+    var weekTrades = closed.filter(function (t) { return new Date(t.closed).getTime() >= weekAgo; });
+    var weekPnl = weekTrades.reduce(function (s, t) { return s + t.pnl; }, 0);
+    var lines = [
+      "Trading update " + new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short" }) + ":",
+      "Progress to funded: " + fmtUsd(realized, { plus: true }) + " of " + fmtUsd(target) + " (" + Math.round(progressPct) + "%)",
+      "This week: " + fmtUsd(weekPnl, { plus: true }) + " over " + weekTrades.length + " trade" + (weekTrades.length === 1 ? "" : "s"),
+      "Account: " + fmtUsd(equity),
+      open.length ? "Open right now: " + open.length + " position" + (open.length > 1 ? "s" : "") : "No open positions — flat."
+    ];
+    var text = lines.join("\n");
+    var btn = this;
+    function done(ok) {
+      btn.textContent = ok ? "Copied ✓" : "Copy failed — long-press to select";
+      setTimeout(function () { btn.textContent = "Copy update for wife"; }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(false); });
+    } else { done(false); }
+  });
+
   // ---------- equity curve ----------
   (function drawEquity() {
     var wrap = el("equity-chart-wrap");
@@ -449,7 +539,8 @@
       var gv = lo + ((hi - lo) * g) / 3;
       var gy = y(gv);
       gridLines += '<line x1="' + padL + '" x2="' + (W - padR) + '" y1="' + gy.toFixed(1) + '" y2="' + gy.toFixed(1) + '" stroke="var(--grid)" stroke-width="1"/>';
-      labels += '<text x="' + (padL - 6) + '" y="' + (gy + 4).toFixed(1) + '" text-anchor="end" font-size="10" fill="var(--muted)">' + Math.round(gv / 1000) + "k</text>";
+      var lab = (hi - lo) < 4000 ? (gv / 1000).toFixed(1) + "k" : Math.round(gv / 1000) + "k";
+      labels += '<text x="' + (padL - 6) + '" y="' + (gy + 4).toFixed(1) + '" text-anchor="end" font-size="10" fill="var(--muted)">' + lab + "</text>";
     }
     var endP = pts[pts.length - 1];
 
@@ -562,6 +653,32 @@
       return k + " " + byStyle[k].n + " (" + fmtUsd(byStyle[k].pnl, { plus: true }) + ")";
     }).join(" · ");
 
+    var byGrade = {};
+    closed.forEach(function (t) {
+      var gr = t.grade || "ungraded";
+      byGrade[gr] = byGrade[gr] || { n: 0, pnl: 0 };
+      byGrade[gr].n++; byGrade[gr].pnl += t.pnl;
+    });
+    var gradeLine = Object.keys(byGrade).map(function (k) {
+      var chip = /^(CONFIRMED|MIXED|AGAINST)$/.test(k) ? '<span class="grade-chip grade-' + k + '">' + k + "</span>" : k;
+      return chip + " " + byGrade[k].n + " (" + fmtUsd(byGrade[k].pnl, { plus: true }) + ")";
+    }).join(" &nbsp;·&nbsp; ");
+
+    var rTrades = closed.filter(function (t) { return t.risk > 0; });
+    var avgR = rTrades.length
+      ? (rTrades.reduce(function (s, t) { return s + t.pnl / t.risk; }, 0) / rTrades.length)
+      : null;
+
+    var feesTotal = closed.reduce(function (s, t) { return s + (t.fees || 0); }, 0);
+    var best = Math.max.apply(null, closed.map(function (t) { return t.pnl; }));
+    var worst = Math.min.apply(null, closed.map(function (t) { return t.pnl; }));
+
+    var holds = closed.filter(function (t) { return t.opened && t.closed; }).map(function (t) {
+      return (new Date(t.closed) - new Date(t.opened)) / 3600000;
+    });
+    var avgHold = holds.length ? holds.reduce(function (a, b) { return a + b; }, 0) / holds.length : null;
+    var holdStr = avgHold == null ? "—" : (avgHold < 1 ? Math.round(avgHold * 60) + "m" : avgHold.toFixed(1) + "h");
+
     function stat(label, value, cls) {
       return '<div class="stat"><div class="label">' + label + '</div><div class="value ' + (cls || "") + '">' + value + "</div></div>";
     }
@@ -572,7 +689,12 @@
       stat("Avg win", fmtUsd(avgW), "pos") +
       stat("Avg loss", fmtUsd(avgL), "neg") +
       stat("Expectancy / trade", fmtUsd(expectancy, { plus: true }), pnlClass(expectancy)) +
-      '<div class="stat" style="grid-column:1/-1"><div class="label">By style</div><div class="value" style="font-size:13px;font-weight:600">' + styleLine + "</div></div>";
+      stat("Avg R", avgR == null ? "—" : (avgR >= 0 ? "+" : "") + avgR.toFixed(2) + "R", avgR == null ? "" : pnlClass(avgR)) +
+      stat("Best / worst", fmtUsd(best, { plus: true }) + " / " + fmtUsd(worst)) +
+      stat("Avg hold", holdStr) +
+      stat("Fees paid", fmtUsd(feesTotal)) +
+      '<div class="stat" style="grid-column:1/-1"><div class="label">By style</div><div class="value" style="font-size:13px;font-weight:600">' + styleLine + "</div></div>" +
+      '<div class="stat" style="grid-column:1/-1"><div class="label">By entry grade (conviction check)</div><div class="value" style="font-size:13px;font-weight:600">' + gradeLine + "</div></div>";
   })();
 
   // ---------- open positions ----------
@@ -583,9 +705,20 @@
       return;
     }
     wrap.innerHTML = open.map(function (t) {
+      var riskLine = "";
+      if (t.sl) {
+        var riskUsd = Math.abs(t.entry - t.sl) * t.size;
+        var pctDaily = Math.round((riskUsd / dailyLossAllowed) * 100);
+        var pctDD = Math.round((riskUsd / Math.max(ddHeadroom, 1)) * 100);
+        var warn = pctDD > 30 ? " · <strong>OVERSIZED (>30% of remaining budget)</strong>" : "";
+        riskLine = '<span class="pos-meta">Risk at SL ' + fmtUsd(t.sl) + ": " + fmtUsd(riskUsd) +
+          " (" + pctDaily + "% of daily · " + pctDD + "% of remaining drawdown)" +
+          (t.tp ? " · TP " + fmtUsd(t.tp) : "") + warn + "</span>";
+      }
       return '<div class="open-pos">' +
         '<span><span class="dir-pill dir-' + t.dir + '">' + t.dir + "</span> <strong>" + t.pair + "</strong> · " + t.size + " BTC @ " + fmtUsd(t.entry) + "</span>" +
         '<span style="font-size:12px;color:var(--muted)">' + t.style + " · opened " + t.opened.replace("T", " ") + "</span>" +
+        riskLine +
         (t.notes ? '<span class="pos-meta">' + t.notes + "</span>" : "") +
         "</div>";
     }).join("");
@@ -600,14 +733,18 @@
       return;
     }
     tbody.innerHTML = closed.slice().reverse().map(function (t) {
+      var gradeCell = t.grade ? '<span class="grade-chip grade-' + t.grade + '">' + t.grade + "</span>" : "—";
+      var rCell = t.risk > 0 ? ((t.pnl / t.risk >= 0 ? "+" : "") + (t.pnl / t.risk).toFixed(2)) : "—";
       return "<tr>" +
         "<td>" + dayKey(t.closed) + "</td>" +
         "<td>" + t.pair + "</td>" +
         "<td>" + t.dir + "</td>" +
         "<td>" + t.style + "</td>" +
+        "<td>" + gradeCell + "</td>" +
         '<td class="num">' + fmtUsd(t.entry) + "</td>" +
         '<td class="num">' + fmtUsd(t.exit) + "</td>" +
         '<td class="num">' + t.size + "</td>" +
+        '<td class="num">' + rCell + "</td>" +
         '<td class="num">' + fmtUsd(t.fees) + "</td>" +
         '<td class="num ' + pnlClass(t.pnl) + '"><strong>' + fmtUsd(t.pnl, { plus: true }) + "</strong></td>" +
         "</tr>";
@@ -616,7 +753,7 @@
 
   // ---------- csv export ----------
   el("export-csv").addEventListener("click", function () {
-    var head = ["id", "status", "opened", "closed", "pair", "dir", "style", "entry", "exit", "size", "fees", "pnl", "notes"];
+    var head = ["id", "status", "opened", "closed", "pair", "dir", "style", "grade", "entry", "exit", "size", "sl", "tp", "risk", "fees", "pnl", "notes"];
     var rows = trades.map(function (t) {
       return head.map(function (k) {
         var v = t[k] == null ? "" : String(t[k]);
@@ -634,13 +771,13 @@
   // ---------- demo data ----------
   function demoTrades() {
     return [
-      { id: 1, status: "closed", opened: "2026-07-01T09:10", closed: "2026-07-01T14:40", pair: "BTC/USD", dir: "long", style: "scalp", entry: 58200, exit: 59450, size: 0.8, fees: 24, pnl: 976, notes: "Sweep of 57950 low, reclaim entry" },
-      { id: 2, status: "closed", opened: "2026-07-02T11:00", closed: "2026-07-03T16:20", pair: "BTC/USD", dir: "long", style: "swing", entry: 59100, exit: 61800, size: 1.0, fees: 30, pnl: 2670, notes: "Continuation off spring" },
-      { id: 3, status: "closed", opened: "2026-07-05T20:15", closed: "2026-07-05T22:05", pair: "BTC/USD", dir: "short", style: "headline", entry: 62900, exit: 63400, size: 1.2, fees: 38, pnl: -638, notes: "Faded tariff rumor, stopped — Tier 3 headline, mistake" },
-      { id: 4, status: "closed", opened: "2026-07-07T08:30", closed: "2026-07-08T19:00", pair: "BTC/USD", dir: "long", style: "swing", entry: 62400, exit: 64100, size: 1.1, fees: 34, pnl: 1836, notes: "" },
-      { id: 5, status: "closed", opened: "2026-07-09T13:45", closed: "2026-07-09T15:10", pair: "BTC/USD", dir: "short", style: "scalp", entry: 64500, exit: 64050, size: 1.4, fees: 36, pnl: 594, notes: "R1 rejection" },
-      { id: 6, status: "closed", opened: "2026-07-10T10:00", closed: "2026-07-10T11:30", pair: "BTC/USD", dir: "long", style: "scalp", entry: 63700, exit: 63450, size: 1.3, fees: 33, pnl: -358, notes: "Chop, cut fast" },
-      { id: 7, status: "open", opened: "2026-07-12T19:15", closed: null, pair: "BTC/USD", dir: "short", style: "swing", entry: 64119, exit: null, size: 1.395, fees: 35.78, pnl: null, notes: "Tactical swing short. TP1 63.5k, TP2 62.2k, inval 66k." }
+      { id: 1, status: "closed", opened: "2026-07-01T09:10", closed: "2026-07-01T14:40", pair: "BTC/USD", dir: "long", style: "scalp", grade: "CONFIRMED", entry: 58200, exit: 59450, size: 0.8, sl: 57200, tp: 59500, risk: 800, fees: 24, pnl: 976, notes: "Sweep of 57950 low, reclaim entry" },
+      { id: 2, status: "closed", opened: "2026-07-02T11:00", closed: "2026-07-03T16:20", pair: "BTC/USD", dir: "long", style: "swing", grade: "CONFIRMED", entry: 59100, exit: 61800, size: 1.0, sl: 58200, tp: 61800, risk: 900, fees: 30, pnl: 2670, notes: "Continuation off spring" },
+      { id: 3, status: "closed", opened: "2026-07-05T20:15", closed: "2026-07-05T22:05", pair: "BTC/USD", dir: "short", style: "headline", grade: "AGAINST", entry: 62900, exit: 63400, size: 1.2, sl: 63400, tp: 61800, risk: 600, fees: 38, pnl: -638, notes: "Faded tariff rumor, stopped — Tier 3 headline, mistake" },
+      { id: 4, status: "closed", opened: "2026-07-07T08:30", closed: "2026-07-08T19:00", pair: "BTC/USD", dir: "long", style: "swing", grade: "MIXED", entry: 62400, exit: 64100, size: 1.1, sl: 61600, tp: 64100, risk: 880, fees: 34, pnl: 1836, notes: "" },
+      { id: 5, status: "closed", opened: "2026-07-09T13:45", closed: "2026-07-09T15:10", pair: "BTC/USD", dir: "short", style: "scalp", grade: "CONFIRMED", entry: 64500, exit: 64050, size: 1.4, sl: 64950, tp: 64000, risk: 630, fees: 36, pnl: 594, notes: "R1 rejection" },
+      { id: 6, status: "closed", opened: "2026-07-10T10:00", closed: "2026-07-10T11:30", pair: "BTC/USD", dir: "long", style: "scalp", grade: "MIXED", entry: 63700, exit: 63450, size: 1.3, sl: 63300, tp: 64400, risk: 520, fees: 33, pnl: -358, notes: "Chop, cut fast" },
+      { id: 7, status: "open", opened: "2026-07-12T19:15", closed: null, pair: "BTC/USD", dir: "short", style: "swing", grade: "AGAINST", entry: 64119, exit: null, size: 1.395, sl: 64820, tp: 63100, risk: 978, fees: 35.78, pnl: null, notes: "Tactical swing short. TP 63.1k, inval 66k." }
     ];
   }
 })();
