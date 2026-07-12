@@ -1,6 +1,6 @@
 ---
 name: crypto-market-cycle-trader
-description: Use when analyzing Bitcoin or crypto markets for trading decisions — e.g. "analyze BTC", "where are we in the cycle", "is this a good entry/exit", "build a trading plan", "read the market structure", "check funding/OI before I lever up", "when should I look for entries". Synthesizes technical analysis (TA), Wyckoff-style price action (PA), the BTC 4-year halving cycle, futures/derivatives positioning, the TradFi + crypto macro/volatility calendar (FOMC, CPI/PPI, NFP, witching days, options/futures expiries), and an optional astrological timing overlay into one structured playbook drawing on the methods of well-known crypto traders (Trader Mayne, TraderXO, and others). Not financial advice — an analytical checklist, not a signal generator.
+description: Use when analyzing Bitcoin or crypto markets for trading decisions — e.g. "analyze BTC", "where are we in the cycle", "is this a good entry/exit", "build a trading plan", "read the market structure", "check funding/OI before I lever up", "when should I look for entries", "what's the put/call ratio saying". Synthesizes technical analysis (TA), Wyckoff-style price action (PA), the BTC 4-year halving cycle, futures/options positioning (funding, open interest, live put/call ratio), the TradFi + crypto macro/volatility calendar (FOMC, CPI/PPI, NFP, witching days, options/futures expiries), and an optional astrological timing overlay into one structured playbook drawing on the methods of well-known crypto traders (Trader Mayne, TraderXO, and others). Not financial advice — an analytical checklist, not a signal generator.
 ---
 
 # Crypto Market Cycle Trader
@@ -37,7 +37,7 @@ Run these in order. Each produces one line of output; the synthesis step at the 
 - Volatility/risk sizing: ATR or Bollinger Band width for stop distance.
 - Volume must confirm breakouts/breakdowns — a Wyckoff sign-of-strength on low volume is suspect.
 
-### 4. Futures/derivatives positioning (entry timing) — weight ~15%
+### 4. Futures & options positioning (entry timing) — weight ~15%
 Use this to time entries *within* a thesis already built from steps 1–3, not to generate a thesis on its own.
 
 | Open interest | Funding rate | Price | Read |
@@ -46,6 +46,17 @@ Use this to time entries *within* a thesis already built from steps 1–3, not t
 | Rising | Negative | Falling | Trend confirmed, crowd is short — watch for short-squeeze risk if it stalls |
 | Rising | Either | Flat/chopping | Leverage stacking without resolution — "stored energy," expect a sharp move soon |
 | Falling | Either | Any | Positions closing/deleveraging — often the tail end of a move, not the start |
+
+**Live put/call ratio** (options positioning, checked alongside funding/OI): pull the *live* BTC options put/call ratio (volume or open-interest basis) from Deribit's own stats page or an aggregator (Coinglass, Laevitas, The Block). Read it the same contrarian way CBOE's equity put/call ratio is read in TradFi, since crypto options skew responds to the same fear/greed mechanics:
+
+| Put/call ratio | Literal read | Contrarian read |
+|---|---|---|
+| < ~0.7 (crypto) / < 0.45 (CBOE equity) | Call-heavy — bullish positioning | Speculative excess / greed — caution on new longs |
+| ~0.7–1.0 | Balanced-to-call-tilted | No strong contrarian signal |
+| > 1.0 | Put-heavy — bearish positioning / hedging | Elevated fear — often a better setup for longs than shorts |
+| > ~1.2 (crypto extreme) / > 1.23 (CBOE extreme) | Heavy put buying | Capitulation-style extreme — classic contrarian bounce zone |
+
+Use the **5–10 day moving average** of the ratio, not a single reading — daily put/call prints are noisy and a one-day spike (e.g. a single large hedge trade) is not a sentiment shift. Treat this as a fear/greed cross-check on top of funding/OI, most useful for confirming (or fading) an already-extreme funding/OI reading rather than as a standalone trigger.
 
 Full detail and a walk-through in `references/derivatives-timing.md`.
 
@@ -84,7 +95,7 @@ Bias:            [bullish / bearish / neutral] on [timeframe]
 Cycle context:   [phase + confidence] — see lens 1
 Structure read:  [Wyckoff phase + key level] — see lens 2
 TA confirmation: [trend/momentum/volume state] — see lens 3
-Derivatives:     [funding/OI read + implication] — see lens 4
+Derivatives:     [funding/OI/put-call ratio read + implication] — see lens 4
 Macro calendar:  [any FOMC/CPI/PPI/NFP/witching/expiry inside the trade window — see lens 5, or "clear"]
 Astro flag:      [any active window — vol-up/reduce-size flag only, or "none active"]
 Key levels:      [invalidation level] / [target/next liquidity pool]
@@ -106,7 +117,7 @@ Position sizing: [risk % of account given stop distance]
 
 - `references/trader-playbooks.md` — expanded methodology notes on Trader Mayne, TraderXO, and the other traders referenced above, with sources.
 - `references/btc-cycle-history.md` — halving dates, historical peak/trough timing, drawdown table, and the 2025–2026 divergence from the prior pattern.
-- `references/derivatives-timing.md` — funding rate, open interest, and liquidation-heatmap mechanics with a fuller decision matrix.
+- `references/derivatives-timing.md` — funding rate, open interest, put/call ratio, and liquidation-heatmap mechanics with a fuller decision matrix.
 - `references/macro-calendar.md` — 2026 FOMC/CPI/PPI/NFP/witching/crypto-options-expiry dates and a weekly event-risk checklist.
 - `references/astro-timing.md` — expanded astrological timing concepts, sourcing, and caveats.
 
