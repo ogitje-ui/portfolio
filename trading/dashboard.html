@@ -301,9 +301,9 @@
     "accountName": "Prop · Intermediate Eval 1",
     "startingBalance": 100000,
     "profitTarget": 12000,
-    "maxDrawdownPct": 6,
+    "maxDrawdownPct": 5,
     "dailyLossLimitPct": 3,
-    "limitsAssumed": true
+    "limitsAssumed": false
   },
   "trades": [
     {
@@ -368,15 +368,10 @@
   var target = config.profitTarget;
   var progressPct = Math.max(0, Math.min(100, (realized / target) * 100));
 
-  // peak equity for drawdown
-  var runningEq = config.startingBalance, peakEq = config.startingBalance;
-  closed.forEach(function (t) {
-    runningEq += t.pnl;
-    if (runningEq > peakEq) peakEq = runningEq;
-  });
-  var currentDD = peakEq - equity;
+  // static drawdown floor (Breakout-style: fixed level below starting balance, not trailing)
   var maxDDAllowed = config.startingBalance * (config.maxDrawdownPct / 100);
-  var ddHeadroom = maxDDAllowed - currentDD;
+  var ddFloor = config.startingBalance - maxDDAllowed;
+  var ddHeadroom = equity - ddFloor;
 
   var tKey = todayKey();
   var todayPnl = closed.reduce(function (s, t) { return s + (dayKey(t.closed) === tKey ? t.pnl : 0); }, 0);
@@ -413,13 +408,13 @@
   var tDaily = el("tile-daily");
   tDaily.textContent = fmtUsd(Math.max(0, dailyHeadroom));
   tDaily.className = "value " + (dailyHeadroom < dailyLossAllowed * 0.34 ? "neg" : "");
-  el("tile-daily-hint").textContent = "of " + fmtUsd(dailyLossAllowed) + " daily-loss limit";
+  el("tile-daily-hint").textContent = "of " + fmtUsd(dailyLossAllowed) + " · resets daily";
   el("daily-assumed").textContent = config.limitsAssumed ? "assumed · " : "";
 
   var tDD = el("tile-dd");
   tDD.textContent = fmtUsd(Math.max(0, ddHeadroom));
   tDD.className = "value " + (ddHeadroom < maxDDAllowed * 0.34 ? "neg" : "");
-  el("tile-dd-hint").textContent = "of " + fmtUsd(maxDDAllowed) + " max drawdown";
+  el("tile-dd-hint").textContent = "floor " + fmtUsd(ddFloor) + " · " + fmtUsd(maxDDAllowed) + " max";
   el("dd-assumed").textContent = config.limitsAssumed ? "assumed · " : "";
 
   // ---------- equity curve ----------
