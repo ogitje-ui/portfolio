@@ -133,6 +133,36 @@ Explicit caveat: there is no demonstrated causal mechanism here. It is included 
 
 Expanded notes and sourcing caveats in `references/astro-timing.md`.
 
+## Trade setup requests: always verdict first, then concrete setups
+
+Whenever the user asks for a trade setup (or "should I enter", "give me a play", "what's the trade here"), do NOT just describe the market. Always respond with:
+
+**1. A verdict line, first sentence: SCALP / SWING / STAND ASIDE** — decided from the data, not from what the user seems to want to hear:
+
+| Conditions | Verdict |
+|---|---|
+| Primary pillars aligned (2-of-4: PA, TA, cycle, spot flow), no Tier-1 event inside ~48h, price at/near a decision level | **SWING** |
+| Pillars conflicting or price mid-range, but clear intraday levels + derivatives fuel (liquidation clusters, funding skew) exist | **SCALP** only |
+| Active breaking headline (lens 7) | **SCALP** via the Headline Trade Protocol; swing only if the event graduates into a structural break |
+| High-impact scheduled print (FOMC/CPI/PPI/NFP) inside 24–48h | **SCALP** pre-event at most; swing entries wait for the post-print direction |
+| Chop flags stacked (astro window + mid-range + no derivatives fuel) or eval guardrails tight (daily-loss/drawdown headroom low in the journal) | **STAND ASIDE** — say so plainly and state what has to change to re-engage |
+
+**2. Concrete setups in card form** — primary side only when bias is clear; both sides when neutral. Every setup card contains all seven fields:
+
+```
+Side/Type:    [long/short] [scalp/swing]
+Entry:        [zone or trigger — e.g. "sweep of $62k + reclaim", "retest-hold of $65.8k from above"]
+Confirmation: [what must print first — close, volume, funding/OI behavior; never a first-touch entry]
+Stop:         [structure-based level, beyond the wick/invalidation — never a bare %]
+Targets:      [TP ladder with partial-take levels; scalps get one TP + time-box]
+Size:         [risk % per the risk rules, adjusted for chop/headline/event flags AND current eval headroom from trading/dashboard.html]
+Dies if:      [the specific condition that cancels the setup before entry triggers]
+```
+
+**3. The one-line reason for the verdict** — which data made it a scalp vs. a swing (e.g. "pillars split 2-2 and CPI lands Wednesday, so nothing here deserves swing duration").
+
+Setups are conditional plays at levels, not predictions — if price never reaches the trigger, the setup expires untouched. State an expiry for every card (a session for scalps, a week or an event for swings).
+
 ## Synthesis & output template
 
 Two modes, matching the timeframe-adaptation section above:
