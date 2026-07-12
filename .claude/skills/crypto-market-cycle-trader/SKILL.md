@@ -192,6 +192,7 @@ Position sizing: [risk % of account given stop distance]
 
 - Define invalidation *before* entry, from structure (lens 2), never an arbitrary percentage.
 - Size positions from stop distance and a fixed account-risk percentage (e.g. 0.5–2% risk per idea), not from conviction.
+- **Prop-eval accounts**: risk per trade is defined against the *remaining drawdown budget* (from `trading/dashboard.html` guardrails), not the notional balance — default 10–20% of remaining budget per idea. On this user's eval ($5,000 static drawdown floor, $3,000 daily), that means ~$500–$1,000 risk per trade; any single trade risking >30% of remaining budget is oversized regardless of conviction. Setup-card size fields must be computed this way.
 - Funding/OI extremes are a reason to reduce leverage, not increase it.
 - Weight spot-flow signals (Coinbase premium, ETF net flows) above derivatives signals when they conflict — real capital moving is stronger evidence than leveraged positioning.
 - Historical 4-year-cycle bear phases have produced 70–85% peak-to-trough drawdowns — size and leverage choices should assume this can happen again, especially late in a markup phase that feels euphoric.
