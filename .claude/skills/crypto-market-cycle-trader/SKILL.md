@@ -185,6 +185,35 @@ When the user expresses a directional feeling ("I think it's going down", "I wan
 
 This rule exists at the user's own request: agreement is worth nothing to them; the framework's disagreement is what they're paying for.
 
+## Conviction-based sizing engine (prop eval)
+
+Conviction scales **size only — never stop distance, never leverage-into-losses**. Every setup card computes its size from this engine using live numbers from `trading/dashboard.html`.
+
+**Budgets (recompute before every trade):**
+- `DD_remaining = equity − 95,000` (distance to the static drawdown floor)
+- `Daily_remaining = 3,000 + min(0, today's realized PnL)`
+- `Max_single_risk = min(tier% × DD_remaining, 85% × Daily_remaining)` — the 15% daily buffer absorbs slippage/fees on a stop-out, since crypto wicks can fill past the stop.
+
+**Tiers (from the conviction-check verdict + setup location):**
+
+| Tier | Definition | Risk while equity < 100k (recovery gear) | Risk while equity ≥ 100k (normal gear) |
+|---|---|---|---|
+| A+ | 3–4 primary pillars aligned, entry at a range edge/confirmed level, derivatives + cross-asset confirming, no event window inside 24h | 20% of DD_remaining | 25% of DD_remaining |
+| Standard | CONFIRMED verdict (2 pillars + clean location) | 12% of DD_remaining | 15% of DD_remaining |
+| MIXED | Mixed verdict or mid-range location | No trade (recovery) | Optional scalp at 5%, or skip |
+| AGAINST | Framework disagrees | No trade — say so | No trade — say so |
+
+The two-gear structure means size grows as the account recovers and compounds: sizing off *remaining budget* automatically de-risks in drawdown (anti-martingale) and re-risks in profit, with no discretion required.
+
+**Hard caps that override everything:**
+- Single trade never risks more than **60% of Daily_remaining** — one stop-out must never end the trading day by itself.
+- Total open risk across concurrent positions ≤ the A+ single-trade cap — no stacking two "confirmed" trades into one oversized bet.
+- After **2 losses in a day**: only A+ setups allowed for the rest of the day, at recovery-gear size.
+- At **−$1,500 on the day** (half the daily budget): done for the day, regardless of setup quality. The last $1,500 of daily budget is a buffer, not ammunition.
+- Being "very sure" raises the tier %, never the stop width, and never overrides an event-window or headline-verification block.
+
+**Honest caveat**: the engine guarantees sized trades can't breach the floors *if stops fill near their level*. A violent gap through a stop can exceed planned risk — the 15% daily buffer and the 60% single-trade cap exist for exactly that, but tail risk is never zero. Leverage choice should keep liquidation price far beyond the stop so the stop is always what exits, never the liquidation engine.
+
 ## Trade setup requests: always verdict first, then concrete setups
 
 Whenever the user asks for a trade setup (or "should I enter", "give me a play", "what's the trade here"), do NOT just describe the market. Always respond with:
@@ -207,7 +236,7 @@ Entry:        [zone or trigger — e.g. "sweep of $62k + reclaim", "retest-hold 
 Confirmation: [what must print first — close, volume, funding/OI behavior; never a first-touch entry]
 Stop:         [structure-based level, beyond the wick/invalidation — never a bare %]
 Targets:      [ONE full-size TP — the user's prop platform is all-or-nothing on TP orders (no partials). Pick the level that clears ≥1.4:1 vs the stop while exiting before the next bounce zone; SL-editing (e.g. move to entry at a milestone) is allowed and is the substitute for a ladder. Scalps get one TP + time-box]
-Size:         [risk % per the risk rules, adjusted for chop/headline/event flags AND current eval headroom from trading/dashboard.html]
+Size:         [tier (A+/Standard/Mixed) + computed USD risk from the conviction-based sizing engine, using live DD_remaining and Daily_remaining from trading/dashboard.html]
 Dies if:      [the specific condition that cancels the setup before entry triggers]
 ```
 
@@ -245,7 +274,7 @@ Position sizing: [risk % of account given stop distance]
 
 - Define invalidation *before* entry, from structure (lens 2), never an arbitrary percentage.
 - Size positions from stop distance and a fixed account-risk percentage (e.g. 0.5–2% risk per idea), not from conviction.
-- **Prop-eval accounts**: risk per trade is defined against the *remaining drawdown budget* (from `trading/dashboard.html` guardrails), not the notional balance — default 10–20% of remaining budget per idea. On this user's eval ($5,000 static drawdown floor, $3,000 daily), that means ~$500–$1,000 risk per trade; any single trade risking >30% of remaining budget is oversized regardless of conviction. Setup-card size fields must be computed this way.
+- **Prop-eval accounts**: risk per trade is computed by the conviction-based sizing engine (section above) against the *remaining drawdown budget* from `trading/dashboard.html` — never the notional balance. Any single trade risking more than the A+ tier allowance is oversized regardless of conviction.
 - Funding/OI extremes are a reason to reduce leverage, not increase it.
 - Weight spot-flow signals (Coinbase premium, ETF net flows) above derivatives signals when they conflict — real capital moving is stronger evidence than leveraged positioning.
 - Historical 4-year-cycle bear phases have produced 70–85% peak-to-trough drawdowns — size and leverage choices should assume this can happen again, especially late in a markup phase that feels euphoric.

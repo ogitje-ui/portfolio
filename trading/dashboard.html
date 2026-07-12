@@ -259,6 +259,11 @@
       <div class="value" id="tile-dd">—</div>
       <div class="hint"><span class="assumed" id="dd-assumed"></span> <span id="tile-dd-hint"></span></div>
     </div>
+    <div class="tile" style="grid-column:1/-1">
+      <div class="label">Max risk per trade (conviction engine)</div>
+      <div class="value" id="tile-sizing" style="font-size:15px"></div>
+      <div class="hint" id="tile-sizing-hint"></div>
+    </div>
   </div>
 
   <!-- Equity curve -->
@@ -441,6 +446,19 @@
   tDD.className = "value " + (ddHeadroom < maxDDAllowed * 0.34 ? "neg" : "");
   el("tile-dd-hint").textContent = "floor " + fmtUsd(ddFloor) + " · " + fmtUsd(maxDDAllowed) + " max";
   el("dd-assumed").textContent = config.limitsAssumed ? "assumed · " : "";
+
+  // ---------- conviction sizing engine ----------
+  (function sizing() {
+    var gearNormal = equity >= config.startingBalance;
+    var pctA = gearNormal ? 0.25 : 0.20;
+    var pctS = gearNormal ? 0.15 : 0.12;
+    var capDay = 0.60 * Math.max(dailyHeadroom, 0);
+    var aPlus = Math.max(0, Math.min(pctA * ddHeadroom, capDay));
+    var std = Math.max(0, Math.min(pctS * ddHeadroom, capDay));
+    var mixed = gearNormal ? fmtUsd(Math.max(0, Math.min(0.05 * ddHeadroom, capDay))) : "no trade";
+    el("tile-sizing").textContent = "A+ " + fmtUsd(aPlus) + " · Standard " + fmtUsd(std) + " · Mixed " + mixed;
+    el("tile-sizing-hint").textContent = (gearNormal ? "normal gear (equity ≥ start)" : "recovery gear (equity below start)") + " · hard cap 60% of today's remaining budget · conviction scales size, never stops";
+  })();
 
   // ---------- discipline banner ----------
   (function dayState() {
