@@ -154,7 +154,7 @@ Side/Type:    [long/short] [scalp/swing]
 Entry:        [zone or trigger — e.g. "sweep of $62k + reclaim", "retest-hold of $65.8k from above"]
 Confirmation: [what must print first — close, volume, funding/OI behavior; never a first-touch entry]
 Stop:         [structure-based level, beyond the wick/invalidation — never a bare %]
-Targets:      [TP ladder with partial-take levels; scalps get one TP + time-box]
+Targets:      [ONE full-size TP — the user's prop platform is all-or-nothing on TP orders (no partials). Pick the level that clears ≥1.4:1 vs the stop while exiting before the next bounce zone; SL-editing (e.g. move to entry at a milestone) is allowed and is the substitute for a ladder. Scalps get one TP + time-box]
 Size:         [risk % per the risk rules, adjusted for chop/headline/event flags AND current eval headroom from trading/dashboard.html]
 Dies if:      [the specific condition that cancels the setup before entry triggers]
 ```
