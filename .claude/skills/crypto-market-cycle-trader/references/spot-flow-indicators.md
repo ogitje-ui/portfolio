@@ -16,7 +16,7 @@ Coinbase Premium % = (Coinbase_BTCUSD_price − Reference_price) / Reference_pri
 
 **Live sources, tested and confirmed working (no API key required)**:
 - Coinbase spot price: `https://api.coinbase.com/v2/prices/BTC-USD/spot` or `https://api.exchange.coinbase.com/products/BTC-USD/ticker`
-- Reference "global" price: `https://api.kraken.com/0/public/Ticker?pair=XBTUSD` or OKX `https://www.okx.com/api/v5/public/... ` — both free, no key. **Binance's own public API (the traditional reference venue) is free/no-key in principle but was geo-blocked from this environment's network when tested** — use it directly if your own network isn't restricted, otherwise Kraken or OKX are a reasonable substitute reference.
+- Reference "global" price: **Binance via its public market-data domain `https://data-api.binance.vision/api/v3/ticker/price?symbol=BTCUSDT`** (tested working — this domain bypasses the geo-block that hits Binance's main API from some networks), which restores the traditional Binance BTC-USDT reference leg (adjust for the USDT/USD peg). Fallbacks: `https://api.kraken.com/0/public/Ticker?pair=XBTUSD` or OKX — both free, no key.
 - This DIY computation is a close proxy, not an exact replica of any single vendor's proprietary formula — differences in exact reference venue and USDT/USD handling will cause small deviations from published Coinbase Premium Index values.
 
 **Official/vendor source**: CryptoQuant publishes a "Coinbase Premium Index" as a named metric. Their API requires a free signup for a key (confirmed: unauthenticated requests return a clear 401 asking for a Bearer token) — the free tier is rate-limited/delayed; full real-time access is a paid plan.

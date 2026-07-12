@@ -41,6 +41,23 @@ Endpoint: `https://community-api.coinmetrics.io/v4/timeseries/asset-metrics?asse
 
 `https://www.okx.com/api/v5/public/liquidation-orders?instType=SWAP&uly=BTC-USD&state=filled` — recent forced-liquidation prints (side, size, price). Single-venue proxy, not aggregate: use it to confirm *whether* a move was liquidation-driven and which side got flushed, and to spot cascades in progress (cluster of same-side prints). For USDT-margined add `uly=BTC-USDT`.
 
+## Multi-venue funding & OI aggregation (lens 5) — six venues, no key
+
+Aggregating across venues turns single-exchange readings into a Coinglass-style composite, and **cross-venue funding divergence is itself a signal** (one venue's crowd markedly more long/short than the rest = that venue's positioning gets flushed first).
+
+| Venue | Endpoint | Notes |
+|---|---|---|
+| OKX | (see Derivatives section above) | Funding + OI + long/short + taker + liquidations |
+| Deribit perp | `https://www.deribit.com/api/v2/public/ticker?instrument_name=BTC-PERPETUAL` | `funding_8h`, `open_interest` (USD), mark |
+| Hyperliquid (DEX) | `POST https://api.hyperliquid.xyz/info` body `{"type":"metaAndAssetCtxs"}` | Per-asset funding (hourly rate) + OI in BTC; large venue, fully keyless |
+| Bitget | `https://api.bitget.com/api/v2/mix/market/ticker?symbol=BTCUSDT&productType=USDT-FUTURES` | `fundingRate`, `holdingAmount` (OI in BTC) |
+| KuCoin | `https://api-futures.kucoin.com/api/v1/contracts/XBTUSDTM` | `fundingFeeRate`, `openInterest` (lots), mark |
+| Gate.io | `https://api.gateio.ws/api/v4/futures/usdt/contracts/BTC_USDT` | `funding_rate` (8h), mark |
+
+Aggregation guidance: normalize funding to a common 8h basis (Hyperliquid publishes hourly — ×8), then read (a) the OI-weighted average funding as the composite crowd position, and (b) the spread between the most-positive and most-negative venue as the divergence signal. For OI, track each venue's 3–7 day *trend* rather than summing mixed units.
+
+**Binance geo-block workaround**: `https://data-api.binance.vision/api/v3/ticker/price?symbol=BTCUSDT` — Binance's public market-data domain serves spot prices where the main API is region-blocked. Use it as the traditional reference leg of the Coinbase Premium (adjusting for USDT/USD), falling back to Kraken if unavailable. (Futures endpoints are not on this domain — venue table above covers derivatives.)
+
 ## Sentiment (lenses 5, 7 cross-check)
 
 | Metric | Endpoint | Read |
