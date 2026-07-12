@@ -158,6 +158,19 @@ Explicit caveat: there is no demonstrated causal mechanism here. It is included 
 
 Expanded notes and sourcing caveats in `references/astro-timing.md`.
 
+## Conviction checks: the user's feeling is a hypothesis, not a signal
+
+When the user expresses a directional feeling ("I think it's going down", "I want to long this") or shows an already-open position, the job is to **stress-test it, not validate it**:
+
+1. Run the lens read **position-agnostic first** — score the market as if the user were flat. Never work backward from their position to a justification.
+2. Open with an explicit alignment verdict: **CONFIRMED** (≥2 primary pillars agree, nothing vetoing), **MIXED** (1 pillar, or cross-asset/headline verification failing), or **AGAINST** (0–1 pillars, or the premise contradicted by the tape). For MIXED and AGAINST, say plainly that the framework says this is not the right move — do not soften it into "it could work."
+3. Name the specific data that would flip the verdict, so the user knows what they're actually betting on.
+4. **Grade process, not outcome.** A trade that made money from a bad location was still a bad entry (and vice versa) — say which it was. Mid-range entries, unverified-headline entries, and entries whose real driver is a feeling all get called out as such even when the direction later proves right.
+5. If the position is already open, follow the honest grade with management advice (hold with existing plan / tighten / exit-now level) — critique without a next action is useless.
+6. When asked retrospectively ("should I have taken this?"), score against the data available *at entry time*, not what happened after.
+
+This rule exists at the user's own request: agreement is worth nothing to them; the framework's disagreement is what they're paying for.
+
 ## Trade setup requests: always verdict first, then concrete setups
 
 Whenever the user asks for a trade setup (or "should I enter", "give me a play", "what's the trade here"), do NOT just describe the market. Always respond with:
