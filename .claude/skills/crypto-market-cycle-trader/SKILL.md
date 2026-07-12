@@ -243,7 +243,7 @@ Position sizing: [risk % of account given stop distance]
 
 The user's trade journal lives at `trading/dashboard.html` in this repo — a self-contained page (data embedded in its `trade-data` JSON block, no backend) tracking progress toward the prop-eval profit target, equity curve, daily PnL, stats, and open positions, with CSV export for Excel. Workflow when the user posts a position screenshot or reports a fill:
 
-1. Read the screenshot/message and extract: pair, direction, style (scalp/swing/headline), entry, exit (if closing), size, fees, PnL, open/close timestamps.
+1. Read the screenshot/message and extract: pair, direction, style (scalp/swing/headline), entry, exit (if closing), size, fees, PnL, open/close timestamps, plus `sl`/`tp` if visible, `risk` (USD at stop), and `grade` — the conviction-check verdict at entry time (CONFIRMED/MIXED/AGAINST). The dashboard computes R-multiples and PnL-by-grade from these, which is how the framework's value gets proven or disproven against real trades.
 2. Edit the `trade-data` JSON block in `trading/dashboard.html` — append new trades, or move an open trade to `status: "closed"` with `exit`, `closed`, and `pnl` filled in. Never maintain a second copy of the data anywhere else; this block is the single source of truth.
 3. Include a one-line `notes` field capturing the setup and which lens triggered it — this builds the by-style stats that show which setups actually pay.
 4. Commit and push, then republish the artifact **to the same URL** (pass the existing artifact URL) so the user's wife's bookmarked link stays current.
