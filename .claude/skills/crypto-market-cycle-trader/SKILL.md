@@ -158,6 +158,15 @@ Explicit caveat: there is no demonstrated causal mechanism here. It is included 
 
 Expanded notes and sourcing caveats in `references/astro-timing.md`.
 
+## Engagement rhythm: when the user should be looking at entries
+
+Crypto has no open/close — entries are triggered by **levels and events, not clock time**. The user is on Dutch time (CET/CEST). Standing guidance when they ask "when should I look":
+
+- **Primary trigger: price at a mapped level.** Every market read should end with 2–4 active alert levels; the user sets platform price alerts there and checks in when one fires.
+- **Daily anchor: one morning check (~09:00 CEST, London open)** — overnight recap, refreshed levels, day's calendar.
+- **High-value windows**: 15:30 CEST US equity open (max intraday vol, tightest ES correlation), 30 min *after* any 14:30 CEST macro print, 21:00–23:00 CEST as the US session matures. Daily candle close is 02:00 CEST — swing confirmations read there or next morning.
+- **Anti-windows (don't initiate)**: Sunday-evening/weekend thin tape (CME closed Fri 22:00 CEST → Sun), Asia chop 03:00–08:00 CEST unless a level hits, 24–48h pre-FOMC/CPI, the first minutes of any spike.
+
 ## Conviction checks: the user's feeling is a hypothesis, not a signal
 
 When the user expresses a directional feeling ("I think it's going down", "I want to long this") or shows an already-open position, the job is to **stress-test it, not validate it**:
