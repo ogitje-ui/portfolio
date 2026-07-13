@@ -82,6 +82,8 @@ Use the **5–10 day moving average** of the ratio, not a single reading — dai
 
 **Additional positioning/sentiment feeds** (all free/no-key, endpoints + interpretation in `references/live-data-quickref.md`): open interest trend (OKX), retail long/short account ratio (contrarian at extremes, trend matters), taker buy/sell volume (aggression/absorption divergences), DVOL implied-vol index (low = complacency before expansion, spike = stress priced), CME basis (institutional demand gauge: healthy contango vs defensive backwardation), and the Fear & Greed Index (<20 contrarian bounce zone, >80 trim zone).
 
+**Dealer-positioning proxy / gamma walls** (`scripts/gamma_walls.py`): the largest Deribit option-OI strikes act as pins/friction levels — put walls below spot are support shelves, call walls above are resistance caps, and price tends to stall into a heavy wall then accelerate through it. A gamma wall coinciding with a lens-2 structure level is a materially stronger level than either alone. It's a proxy for the (key-gated) true dealer-gamma model, not a replacement.
+
 Full detail and a walk-through in `references/derivatives-timing.md`.
 
 ### 6. Macro & volatility calendar (scheduled event-risk timing) — weight ~10%

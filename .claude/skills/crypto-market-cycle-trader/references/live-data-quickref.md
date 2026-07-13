@@ -25,6 +25,14 @@ Every endpoint below is free, requires no API key, and was tested working (July 
 | Options put/call (by OI) | `https://www.deribit.com/api/v2/public/get_book_summary_by_currency?currency=BTC&kind=option` | Sum open_interest by instrument suffix -P vs -C; contrarian thresholds in derivatives-timing.md |
 | CME basis | Yahoo `BTC=F` (see cross-asset syntax) vs spot | (futures − spot)/spot: healthy contango 5–15% annualized = normal institutional demand; flat/backwardation = institutions defensive; steep contango >20% = overheated |
 
+## Dealer-positioning proxy / gamma walls (lens 5) — free, no key
+
+Run `python3 .claude/skills/crypto-market-cycle-trader/scripts/gamma_walls.py` — computes from Deribit option OI (no key):
+- **Gamma walls**: the largest-OI strikes act as magnets/pins into expiry and as high-friction levels intraday, because dealer delta-hedging concentrates there. Big **put walls below spot = support shelves**; **call walls above = resistance caps**. A move usually slows/stalls approaching a heavy wall and accelerates once through it (dealers flip from dampening to chasing).
+- **Max pain**: strike minimizing total holder payout — a mild gravitational pin into expiry, never a precise target (see macro-calendar.md on expiry mechanics).
+- **Near-dated P/C by OI**: >1 put-heavy/hedged, <0.7 call-heavy/greedy — contrarian.
+- This is a *proxy*, not a true dealer gamma model (that needs per-option greeks and a dealer-side sign assumption, which free data can't give). Use it to explain *where* price meets friction and *which* levels are defended, cross-referenced with the lens-2 structure map — a gamma wall coinciding with a PA level is a much stronger level than either alone. The real aggregated dealer-gamma / liquidation-heatmap products remain key-gated (Coinglass).
+
 ## On-chain (lenses 1, 4) — Coin Metrics community API, free, no key
 
 Endpoint: `https://community-api.coinmetrics.io/v4/timeseries/asset-metrics?assets=btc&metrics=<list>&frequency=1d&sort=time&start_time=<date>` (community tier = 31 BTC metrics, ~1-day lag; realized cap raw is paid but the ratios below are free).
