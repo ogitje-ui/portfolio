@@ -27,6 +27,8 @@ This framework serves both a several-hours scalp and a multi-day swing — read 
 
 Run these in order. Each produces one line of output; the synthesis step at the end combines them.
 
+**NON-NEGOTIABLE — never skip computing.** Every lens that has a live data source must be computed from that source on every read, never estimated, recalled from a prior message, or eyeballed. This means: pull candles and compute BB(20,2) + %B, RSI(14), ATR, and the MA stack (lens 3); pull the six-venue funding/OI composite, long/short, taker, liquidations, DVOL (lens 5); pull premium, ETF flows, netflow, MVRV (lenses 1/4); pull the cross-asset tape (lens 8). If a source genuinely fails, say so in one line and continue — but "I didn't check" is never acceptable when the endpoint is in `references/live-data-quickref.md`. A number stated without having fetched it is a defect. When in doubt, compute it.
+
 ### 1. Cycle context (macro timing) — weight ~5%
 - Compute months since/until the nearest halving.
 - Historical pattern (see `references/btc-cycle-history.md` for the full table): bull tops have clustered 12–18 months post-halving; peak-to-trough bear drawdowns have run 77–85%; bear bottoms have historically formed before the next halving.
