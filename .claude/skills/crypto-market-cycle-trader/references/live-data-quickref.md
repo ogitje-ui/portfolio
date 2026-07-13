@@ -83,6 +83,13 @@ The model behind max-pain pinning and post-expiry volatility releases. Deribit's
 |---|---|---|
 | Fear & Greed Index | `https://api.alternative.me/fng/?limit=7` | 0–100 composite. Contrarian at extremes: <20 extreme fear = bounce zone historically, >80 extreme greed = trim zone. Mid-range = no signal |
 
+## Computed TA indicators (lens 3) — from OHLC candles, no key
+
+Pull candles: `https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=<4h|1h|1d>&limit=<n>` (each row: [openTime, O, H, L, C, V, ...]). Compute in-session; don't eyeball a chart.
+
+- **Bollinger Bands BB(20,2)**: basis = 20-period SMA of closes; upper/lower = basis ± 2× population stdev. Report basis, upper, lower, band width % (=(upper−lower)/basis), and %B (=(price−lower)/(upper−lower); <0 = below lower band, >100 = above upper). **Breach ≠ reversal**: price closing outside a band is *stretched*, and in a trend it "walks the band." A lower-band breach only becomes a mean-reversion long on a **close back inside the band**; treat a breach that coincides with a structure level (a support zone / liquidity pool) as a higher-conviction reclaim setup than either alone. A squeeze (low band width) preceding the breach means volatility expansion — the move has fuel.
+- **RSI(14)**, **ATR(14)** (stop distance), **20/50/200 SMA/EMA** stack: compute from the same candle pull as needed per lens 3.
+
 ## Cross-asset (lens 8)
 
 Yahoo Finance chart API (browser User-Agent required): `https://query1.finance.yahoo.com/v8/finance/chart/<SYM>?interval=1d&range=5d` — symbols `GC=F` gold, `SI=F` silver, `CL=F` WTI, `BZ=F` Brent, `DX-Y.NYB` DXY, `^TNX` 10Y, `^VIX` VIX, `ES=F`/`NQ=F` equity futures, `BTC=F` CME bitcoin futures. Full interpretation in cross-asset-signals.md.

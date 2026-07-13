@@ -43,7 +43,7 @@ Run these in order. Each produces one line of output; the synthesis step at the 
 ### 3. Technical analysis confirmation (TA) — weight ~15%
 - Trend: 50/100/200-period moving averages on daily/weekly; is price above or below, and are the MAs stacked in order?
 - Momentum: RSI, especially divergence at range extremes (price higher-high, RSI lower-high = bearish divergence, and vice versa).
-- Volatility/risk sizing: ATR or Bollinger Band width for stop distance.
+- Volatility/risk sizing: ATR or Bollinger Band width for stop distance. Compute BB(20,2), RSI(14), ATR, and the MA stack live from candles (`references/live-data-quickref.md`) rather than eyeballing. A band breach is *stretched, not reversed* — a lower-band breach becomes a mean-reversion long only on a close back inside the band, and is higher-conviction when it coincides with a structure level; a squeeze before the breach signals volatility expansion with fuel behind the move.
 - Volume must confirm breakouts/breakdowns — a Wyckoff sign-of-strength on low volume is suspect.
 
 ### 4. Spot demand & institutional flow — weight ~15%
