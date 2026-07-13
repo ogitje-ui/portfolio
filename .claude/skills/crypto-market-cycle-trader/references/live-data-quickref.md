@@ -58,6 +58,25 @@ Aggregation guidance: normalize funding to a common 8h basis (Hyperliquid publis
 
 **Binance geo-block workaround**: `https://data-api.binance.vision/api/v3/ticker/price?symbol=BTCUSDT` — Binance's public market-data domain serves spot prices where the main API is region-blocked. Use it as the traditional reference leg of the Coinbase Premium (adjusting for USDT/USD), falling back to Kraken if unavailable. (Futures endpoints are not on this domain — venue table above covers derivatives.)
 
+## DIY estimated liquidation clusters (lens 5) — heatmap approximation, no key
+
+True aggregated liquidation heatmaps are Coinglass-proprietary (key-gated). A workable approximation, since liquidation price is a mechanical function of entry and leverage:
+
+1. Identify where OI built up (the 3–7 day OI trend vs price — a sideways price with rising OI marks the entry zone).
+2. Project liquidation clusters below (for longs) / above (for shorts) that zone at standard leverage-tier distances: **~2% away for 50x, ~4% for 25x, ~10% for 10x** (maintenance margins shift these slightly per venue).
+3. Cross-check: a projected cluster that coincides with a PA liquidity pool (equal lows/highs, old range extremes) is a high-confidence magnet — same logic as lens 2's sweep zones, derived independently.
+4. Confirm after the fact with OKX liquidation prints (endpoint above): if price enters the projected cluster and prints show the expected side being flushed, the map was right — trust the next projection more.
+
+## Dealer gamma / market-maker positioning (lenses 5, 6) — DIY GEX from Deribit, no key
+
+The model behind max-pain pinning and post-expiry volatility releases. Deribit's public options data makes a workable approximation free:
+
+- Data: `get_book_summary_by_currency?currency=BTC&kind=option` gives per-instrument open interest; instrument names encode expiry + strike + P/C. `ticker?instrument_name=<opt>` returns greeks (gamma) per instrument for precision, or approximate gamma analytically from strike/expiry/DVOL.
+- Method: assume dealers are net short the options the crowd is net long (standard simplification). Sum OI-weighted gamma per strike → find the **zero-gamma flip level** where net dealer gamma changes sign.
+- Read: price **above** the flip = dealers hedge counter-trend (sell rallies, buy dips) → moves dampen, ranges hold, favor mean-reversion scalps. Price **below** the flip = dealers hedge with-trend (sell into falls) → moves amplify, breakdowns extend, favor momentum/continuation and wider targets.
+- Near a big monthly/quarterly expiry (lens 6): high gamma concentration at a strike = pinning force toward it into settlement; the post-expiry gamma unwind is the volatility-release mechanic already described in macro-calendar.md.
+- Caveat: the dealers-net-short assumption is a simplification the whole retail-GEX industry shares (SqueezeMetrics/SpotGamma-style); treat the flip level as a zone, not a line.
+
 ## Sentiment (lenses 5, 7 cross-check)
 
 | Metric | Endpoint | Read |
